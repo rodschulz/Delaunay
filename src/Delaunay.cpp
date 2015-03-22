@@ -37,5 +37,6 @@ int main(void)
 
 	// Set initial triangulation surrounding all the points
 
+
 	return EXIT_SUCCESS;
 }

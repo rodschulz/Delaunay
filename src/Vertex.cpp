@@ -19,3 +19,9 @@ Vertex::Vertex(const float _x, const float _y)
 Vertex::~Vertex()
 {
 }
+
+std::ostream &operator<<(std::ostream &_stream, const Vertex &_vertex)
+{
+	_stream << "[" << _vertex.getX() << ", " << _vertex.getY() << "]";
+	return _stream;
+}

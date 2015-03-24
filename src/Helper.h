@@ -6,6 +6,8 @@
 
 #include "Vertex.h"
 
+#define COMPARISON_EPSILON	1E-10
+
 class Helper
 {
 public:

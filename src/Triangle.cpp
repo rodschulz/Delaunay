@@ -35,36 +35,54 @@ void Triangle::addInCCW(const Vertex *_vertex1, const Vertex *_vertex2, const Ve
 
 bool Triangle::contains(const Vertex *_vertex) const
 {
-	return (Helper::getOrientation(vertices[0], vertices[1], _vertex) >= 0)
-	                && (Helper::getOrientation(vertices[1], vertices[2], _vertex) >= 0)
-	                && (Helper::getOrientation(vertices[2], vertices[0], _vertex) >= 0);
+	return (Helper::getOrientation(vertices[0], vertices[1], _vertex) >= 0) && (Helper::getOrientation(vertices[1], vertices[2], _vertex) >= 0) && (Helper::getOrientation(vertices[2], vertices[0], _vertex) >= 0);
 }
 
-vector<Triangle> Triangle::split(const Vertex &_vertex) const
+bool Triangle::inEdge(const Vertex * _vertex) const
 {
-	vector<Triangle> triangles = vector<Triangle>();
-	if (contains(&_vertex))
+	for (int i = 0; i < 3; i++)
 	{
-		for (int i = 0; i < 3; i++)
+		if (!Helper::areCollinear(vertices[i], vertices[(i + 1) % 3], _vertex))
+			return true;
+	}
+
+	return false;
+}
+
+bool Triangle::setNeighbor(const Triangle *_t)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
 		{
-			if (!Helper::areCollinear(vertices[i], vertices[(i + 1) % 3], &_vertex))
+			if ((vertices[i] == _t->vertices[j]) && (vertices[(i + 1) % 3] == _t->vertices[(j + 1) % 3]))
 			{
-				Triangle t = Triangle(vertices[i], vertices[(i + 1) % 3], &_vertex);
-				t.setNeighbors();
-				triangles.push_back();
+				neighbors[i] = (Triangle *) _t;
+				return true;
 			}
 		}
 	}
 
-	return triangles;
+	return false;
 }
 
-void Triangle::setNeighbors(const Triangle *_t1, const Triangle *_t2, const Triangle *_t3)
-{}
+bool Triangle::isNeighbor(const Triangle *_t) const
+{
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			if ((vertices[i] == _t->vertices[j]) && (vertices[(i + 1) % 3] == _t->vertices[(j + 1) % 3]))
+				return true;
+		}
+	}
+
+	return false;
+}
 
 std::ostream &operator<<(std::ostream &_stream, const Triangle &_triangle)
 {
-	_stream << _triangle.vertices[0] << " | " << _triangle.vertices[1] << " | "
-	                << _triangle.vertices[2];
+	_stream << _triangle.vertices[0] << "\n" << _triangle.vertices[1] << "\n"
+	                << _triangle.vertices[2] << "\n\n";
 	return _stream;
 }

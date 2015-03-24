@@ -35,6 +35,8 @@ public:
 
 	// Operator to be able to print the vertices in stdout
 	friend std::ostream &operator<<(std::ostream &_stream, const Vertex &_vertex);
+	// Comparison operator
+	bool operator==(const Vertex &_other) const;
 
 private:
 	float x;

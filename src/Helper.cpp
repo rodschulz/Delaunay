@@ -4,8 +4,6 @@
  */
 #include "Helper.h"
 
-#define COMPARISON_EPSILON	E-10
-
 double Helper::getOrientation(const Vertex *_v1, const Vertex *_v2, const Vertex *_v3)
 {
 	// This is the calculation of a determinant to evaluate the
@@ -25,5 +23,5 @@ double Helper::getOrientation(const Vertex *_v1, const Vertex *_v2, const Vertex
 
 bool Helper::areCollinear(const Vertex *_v1, const Vertex *_v2, const Vertex *_v3)
 {
-	return abs(getOrientation(_v1, _v2, _v3)) < 1E-10;
+	return abs(getOrientation(_v1, _v2, _v3)) < COMPARISON_EPSILON;
 }

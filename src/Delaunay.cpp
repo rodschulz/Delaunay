@@ -20,9 +20,9 @@ void printTriangulation(const vector<Triangle> &_triangulation)
 {
 	static int counter = 0;
 
-	string str = "triangulacion";
-	str += counter++;
-	str += ".txt";
+	string str = "/media/rodrigo/Documents/UChile/Fall2015/CC72Y/triangulation_";
+	str += std::to_string(counter++);
+	str += ".dat";
 
 	ofstream stream;
 	stream.open(str.c_str(), std::ofstream::out);
@@ -65,7 +65,7 @@ queue<Vertex *> generatePendingQueue(const vector<Vertex> &_vertexList)
 	while (!aux.empty())
 	{
 		int index = getRandomInt(aux.size() - 1);
-		cout << "index: " << index << " vertex:" << *aux[index] << "\n";
+		cout << "index: " << index << " vertex: " << *aux[index] << "\n";
 
 		pendingVertices.push(aux[index]);
 		aux.erase(aux.begin() + index);
@@ -109,9 +109,12 @@ vector<Triangle *> addNewTriangles(const vector<int> &_containerTriangles, vecto
 			// Create new triangle
 			_triangulation.push_back(Triangle(vertices[k], vertices[(k + 1) % 3], _vertex));
 
-			// Set neighbor from the neighbor of the splitted triangle
-			if (!_triangulation.back().setNeighbor(container.getNeighbor(k)))
-				cout << "ERROR: setting a neighbor no-neighbor\n";
+			// If neighbor exists, then set neighbor from the neighbor of the splitted triangle
+			if (container.getNeighbor(k) != NULL)
+			{
+				if (!_triangulation.back().setNeighbor(container.getNeighbor(k)))
+					cout << "ERROR: setting a neighbor no-neighbor\n";
+			}
 		}
 
 		// Set pending neighbors for new triangles
@@ -119,22 +122,30 @@ vector<Triangle *> addNewTriangles(const vector<int> &_containerTriangles, vecto
 		_triangulation[j].setNeighbor(&_triangulation[j + 1]);
 		_triangulation[j].setNeighbor(&_triangulation[j + 2]);
 
-		_triangulation[j + 1].setNeighbor(&_triangulation[j - 1]);
-		_triangulation[j + 1].setNeighbor(&_triangulation[j + 1]);
+		_triangulation[j + 1].setNeighbor(&_triangulation[j]);
+		_triangulation[j + 1].setNeighbor(&_triangulation[j + 2]);
 
-		_triangulation[j + 2].setNeighbor(&_triangulation[j - 1]);
-		_triangulation[j + 2].setNeighbor(&_triangulation[j - 2]);
+		_triangulation[j + 2].setNeighbor(&_triangulation[j]);
+		_triangulation[j + 2].setNeighbor(&_triangulation[j + 1]);
 
 		// Update neighbors for already existing triangles
 		for (size_t t = firstAdded; t < _triangulation.size(); t++)
 		{
-			_triangulation[t].getNeighbor(0)->setNeighbor(&_triangulation[t]);
-			_triangulation[t].getNeighbor(1)->setNeighbor(&_triangulation[t]);
-			_triangulation[t].getNeighbor(2)->setNeighbor(&_triangulation[t]);
+			if (_triangulation[t].getNeighbor(0) != NULL)
+				_triangulation[t].getNeighbor(0)->setNeighbor(&_triangulation[t]);
+
+			if (_triangulation[t].getNeighbor(1) != NULL)
+				_triangulation[t].getNeighbor(1)->setNeighbor(&_triangulation[t]);
+
+			if (_triangulation[t].getNeighbor(2) != NULL)
+				_triangulation[t].getNeighbor(2)->setNeighbor(&_triangulation[t]);
 		}
 
 		// Delete replaced triangle
 		_triangulation.erase(_triangulation.begin() + _containerTriangles[0]);
+
+		// ACA HAY QUE CAMBIAR TODO ESTO POR USO DE MEMORIA DINAMICA YA QUE AL ELIMINAR O AGREGAR UN TRIANGULO
+		// DEL VECTOR LAS DIRECCIONES DE MEMORIA DE LOS ELEMENTOS PODRIAN CAMBIAR!!!
 	}
 	else
 	{

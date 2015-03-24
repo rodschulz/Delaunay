@@ -49,9 +49,12 @@ public:
 	bool isNeighbor(const Triangle *_t) const;
 
 private:
+	unsigned long id;
 	vector<Vertex *> vertices;
 	vector<Triangle *> neighbors;
 
 	// Adds the vertices in CCW
 	void addInCCW(const Vertex *_vertex1, const Vertex *_vertex2, const Vertex *_vertex3);
+	// Id to make easier the identification of each triangle
+//	unsigned long getId() const;
 };

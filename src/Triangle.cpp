@@ -9,12 +9,19 @@
 
 Triangle::Triangle(const Vertex *_vertex1, const Vertex *_vertex2, const Vertex *_vertex3)
 {
+//	id = getId();
 	addInCCW(_vertex1, _vertex2, _vertex3);
 	neighbors = vector<Triangle *>(3, NULL);
 }
 
 Triangle::~Triangle()
 {
+}
+
+unsigned long Triangle::getId() const
+{
+	static unsigned long nextId = 0;
+	return nextId++;
 }
 
 void Triangle::addInCCW(const Vertex *_vertex1, const Vertex *_vertex2, const Vertex *_vertex3)
@@ -55,7 +62,7 @@ bool Triangle::setNeighbor(const Triangle *_t)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			if ((vertices[i] == _t->vertices[j]) && (vertices[(i + 1) % 3] == _t->vertices[(j + 1) % 3]))
+			if ((vertices[i] == _t->vertices[(j + 1) % 3]) && (vertices[(i + 1) % 3] == _t->vertices[j]))
 			{
 				neighbors[i] = (Triangle *) _t;
 				return true;
@@ -82,7 +89,7 @@ bool Triangle::isNeighbor(const Triangle *_t) const
 
 std::ostream &operator<<(std::ostream &_stream, const Triangle &_triangle)
 {
-	_stream << _triangle.vertices[0] << "\n" << _triangle.vertices[1] << "\n"
-	                << _triangle.vertices[2] << "\n\n";
+	_stream << *_triangle.vertices[0] << "\n" << *_triangle.vertices[1] << "\n"
+	                << *_triangle.vertices[2] << "\n" << *_triangle.vertices[0] << "\n\n";
 	return _stream;
 }

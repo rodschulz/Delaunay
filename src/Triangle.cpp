@@ -9,7 +9,7 @@
 
 Triangle::Triangle(const Vertex *_vertex1, const Vertex *_vertex2, const Vertex *_vertex3)
 {
-//	id = getId();
+	id = getId();
 	addInCCW(_vertex1, _vertex2, _vertex3);
 	neighbors = vector<Triangle *>(3, NULL);
 }

@@ -42,13 +42,13 @@ vector<Vertex> generateVerticesList()
 {
 	vector<Vertex> list = vector<Vertex>();
 
-	list.push_back(Vertex(10, 2));
 	list.push_back(Vertex(9, 6));
 	list.push_back(Vertex(4, 7));
+	list.push_back(Vertex(10, 2));
 	list.push_back(Vertex(6, 3));
-	list.push_back(Vertex(3, 2));
-	list.push_back(Vertex(12, 5));
+	list.push_back(Vertex(14, 8));
 	list.push_back(Vertex(14, 1));
+	list.push_back(Vertex(3, 2));
 
 	return list;
 }
@@ -151,12 +151,19 @@ vector<Triangle *> addNewTriangles(const vector<int> &_containerTriangles, vecto
 	{
 		// This is the case when the point added is over an existing edge
 		string str = "collinear points!!\n";
-		throw exception();
+//		throw exception();
 	}
 
 	printTriangulation(_triangulation);
 
 	return vector<Triangle *>();
+}
+
+void legalizeTriangles(vector<Triangle *> &_triangles)
+{
+	for (size_t i = 0; i < _triangles.size(); i++)
+	{
+	}
 }
 
 int main(void)
@@ -167,10 +174,17 @@ int main(void)
 	vector<Vertex> vertexList = generateVerticesList();
 	vector<Triangle> triangulation = vector<Triangle>();
 
+	/**
+	 * generar triangulacion inicial con un rectangulo que encierra los puntos y luego correrse hacia
+	 * afuera un poco, buscar el centro del rectangulo por sobre el rectangulo (altura igual al
+	 * ancho) y con eso generar rectas para determinar el triangulo contenedor
+	 */
+
+
 	// Set initial triangulation surrounding all the points
-	Vertex v1 = Vertex();
-	Vertex v2 = Vertex(20, 0);
-	Vertex v3 = Vertex(5, 12);
+	Vertex v1 = Vertex(-13,-4);
+	Vertex v2 = Vertex(9, 28);
+	Vertex v3 = Vertex(30, -4);
 	Triangle t0 = Triangle(&v1, &v3, &v2);
 	triangulation.push_back(t0);
 
@@ -183,7 +197,7 @@ int main(void)
 		// get the triangles surrounding the current point
 		vector<int> containers = getContainerTriangles(triangulation, nextVertex);
 		vector<Triangle *> newTriangles = addNewTriangles(containers, triangulation, nextVertex);
-//		legalizeNewTriangles(newTriangles);
+		legalizeTriangles(newTriangles);
 
 		pending.pop();
 	}

@@ -27,23 +27,26 @@ public:
 	// Comparison operator
 	bool operator==(const Vertex &_other) const;
 
-	/** Getters and setters */
-	float getX() const
+	// Get x position
+	inline float getX() const
 	{
 		return x;
 	}
 
-	void setX(float x)
+	// Set x position
+	inline void setX(float x)
 	{
 		this->x = x;
 	}
 
-	float getY() const
+	// Get y position
+	inline float getY() const
 	{
 		return y;
 	}
 
-	void setY(float y)
+	// Set y position
+	inline void setY(float y)
 	{
 		this->y = y;
 	}

@@ -16,6 +16,7 @@ Triangle::Triangle(VertexPtr &_vertex1, VertexPtr &_vertex2, VertexPtr _vertex3)
 
 Triangle::Triangle(const Triangle &_other)
 {
+	id = _other.id;
 	vertices = _other.vertices;
 	neighbors = _other.neighbors;
 }
@@ -48,9 +49,7 @@ void Triangle::addInCCW(const VertexPtr &_vertex1, const VertexPtr &_vertex2, co
 
 bool Triangle::contains(const VertexPtr &_vertex) const
 {
-	return (Helper::getOrientation(vertices[0].get(), vertices[1].get(), _vertex.get()) >= 0)
-			&& (Helper::getOrientation(vertices[1].get(), vertices[2].get(), _vertex.get()) >= 0)
-			&& (Helper::getOrientation(vertices[2].get(), vertices[0].get(), _vertex.get()) >= 0);
+	return (Helper::getOrientation(vertices[0].get(), vertices[1].get(), _vertex.get()) >= 0) && (Helper::getOrientation(vertices[1].get(), vertices[2].get(), _vertex.get()) >= 0) && (Helper::getOrientation(vertices[2].get(), vertices[0].get(), _vertex.get()) >= 0);
 }
 
 bool Triangle::inEdge(const Vertex * _vertex) const
@@ -64,7 +63,7 @@ bool Triangle::inEdge(const Vertex * _vertex) const
 	return false;
 }
 
-bool Triangle::setNeighbor(TrianglePtr _t)
+bool Triangle::setNeighbor(const TrianglePtr &_t)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -95,9 +94,16 @@ bool Triangle::isNeighbor(const Triangle *_t) const
 	return false;
 }
 
+pair<float, float> Triangle::getCenter() const
+{
+	float centerX = (vertices[0]->getX() + vertices[1]->getX() + vertices[2]->getX()) / 3;
+	float centerY = (vertices[0]->getY() + vertices[1]->getY() + vertices[2]->getY()) / 3;
+
+	return make_pair(centerX, centerY);
+}
+
 std::ostream &operator<<(std::ostream &_stream, const Triangle &_triangle)
 {
-	_stream << *_triangle.vertices[0] << "\n" << *_triangle.vertices[1] << "\n"
-	                << *_triangle.vertices[2] << "\n" << *_triangle.vertices[0] << "\n\n";
+	_stream << *_triangle.vertices[0] << "\n" << *_triangle.vertices[1] << "\n" << *_triangle.vertices[2] << "\n" << *_triangle.vertices[0] << "\n\n";
 	return _stream;
 }

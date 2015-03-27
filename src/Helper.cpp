@@ -146,3 +146,14 @@ void Helper::printAll(const vector<TrianglePtr> &_triangulation, const vector<Ve
 
 	Printer::saveImage(_outputName, image);
 }
+
+void Helper::printNeightbors(const vector<TrianglePtr> &_triangulation, const string &_outputName, const string &_extension)
+{
+	for (size_t i = 0; i < _triangulation.size(); i++)
+	{
+		Mat image = Printer::generateBaseImage();
+		Printer::printTriangulation(image, _triangulation);
+		Printer::printNeighbors(image, _triangulation[i]);
+		Printer::saveImage(_outputName + "_" + to_string(i) + _extension, image);
+	}
+}

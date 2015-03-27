@@ -55,6 +55,10 @@ public:
 	 * Prints triangulation and vertices
 	 */
 	static void printAll(const vector<TrianglePtr> &_triangulation, const vector<VertexPtr> &_vertices, const string &_outputName);
+	/**
+	 * Prints a series of images displaying the neighbors associated to each triangle
+	 */
+	static void printNeightbors(const vector<TrianglePtr> &_triangulation, const string &_outputName, const string &_extension);
 
 private:
 	Helper()

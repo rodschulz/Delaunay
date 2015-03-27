@@ -36,6 +36,6 @@ bool Vertex::operator==(const Vertex &_other) const
 
 std::ostream &operator<<(std::ostream &_stream, const Vertex &_vertex)
 {
-	_stream << _vertex.getX() << "\t" << _vertex.getY();
+	_stream << "[" << _vertex.getX() << ", " << _vertex.getY() << "]";
 	return _stream;
 }

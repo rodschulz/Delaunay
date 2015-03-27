@@ -1,6 +1,6 @@
 IS_DEBUG	= y
 
-# compiler and linker flags -std=c++0x
+# compiler and linker flags
 CXXFLAGS	= -Wall -Wextra -pedantic -Wno-unused-function -fmessage-length=0 -std=gnu++11 
 LDFLAGS		= -lpthread -lm
 
@@ -11,11 +11,19 @@ else
 	CXXFLAGS += -O3
 endif
 
+# package configuration to use openCV
+ifneq ($(shell pkg-config --exists opencv && echo ok),ok)
+	$(warning pkg-config can't find required library "opencv")
+endif
+
+CXXFLAGS	+= $(shell pkg-config --cflags opencv)
+LDFLAGS		+= $(shell pkg-config --libs   opencv)
+
 # folders and files locations
 BUILD_DIR	= build
 SOURCE_DIR	= src
 TARGET		= $(BUILD_DIR)/Delaunay
-OBJS		= $(BUILD_DIR)/Delaunay.o $(BUILD_DIR)/Vertex.o $(BUILD_DIR)/Triangle.o $(BUILD_DIR)/Helper.o
+OBJS		= $(BUILD_DIR)/Delaunay.o $(BUILD_DIR)/Vertex.o $(BUILD_DIR)/Triangle.o $(BUILD_DIR)/Helper.o $(BUILD_DIR)/Printer.o
 
 # targets and rules
 .PHONY: all clean
@@ -26,10 +34,10 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/%.h
-	$(CXX) -o $@ -c $< $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -o $@ -c $< $(CXXFLAGS)
 
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
-	$(CXX) -o $@ -c $< $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -o $@ -c $< $(CXXFLAGS)
 
 $(TARGET): $(OBJS)
 	$(CXX) -o $@ $^ $(CXXFLAGS) $(LDFLAGS) 

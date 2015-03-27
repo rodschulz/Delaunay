@@ -13,25 +13,9 @@
 #include "Helper.h"
 #include "Vertex.h"
 #include "Triangle.h"
+#include "Printer.h"
 
 using namespace std;
-
-void printTriangulation(const vector<Triangle> &_triangulation)
-{
-	static int counter = 0;
-
-	string str = "/media/rodrigo/Documents/UChile/Fall2015/CC72Y/triangulation_";
-	str += std::to_string(counter++);
-	str += ".dat";
-
-	ofstream stream;
-	stream.open(str.c_str(), std::ofstream::out);
-
-	for (Triangle t : _triangulation)
-		stream << t;
-
-	stream.close();
-}
 
 int getRandomInt(int max)
 {
@@ -78,70 +62,70 @@ vector<int> getContainerTriangles(const vector<Triangle> &_triangulation, const 
 vector<Triangle *> addNewTriangles(const vector<int> &_containerTriangles, vector<Triangle> &_triangulation, const Vertex *_vertex)
 {
 	/**
-	if (_containerTriangles.size() == 1)
-	{
-		**
-		 * This is the case when the point added is inside a triangle
-		 *
+	 if (_containerTriangles.size() == 1)
+	 {
+	 **
+	 * This is the case when the point added is inside a triangle
+	 *
 
-		// Get data
-		Triangle container = _triangulation[_containerTriangles[0]];
-		vector<VertexPtr> vertices = container.getVertices();
+	 // Get data
+	 Triangle container = _triangulation[_containerTriangles[0]];
+	 vector<VertexPtr> vertices = container.getVertices();
 
-		// Add new triangles
-		int firstAdded = _triangulation.size();
-		for (int k = 0; k < 3; k++)
-		{
-			// Create new triangle
-			_triangulation.push_back(Triangle(vertices[k], vertices[(k + 1) % 3], _vertex));
+	 // Add new triangles
+	 int firstAdded = _triangulation.size();
+	 for (int k = 0; k < 3; k++)
+	 {
+	 // Create new triangle
+	 _triangulation.push_back(Triangle(vertices[k], vertices[(k + 1) % 3], _vertex));
 
-			// If neighbor exists, then set neighbor from the neighbor of the splitted triangle
-			if (container.getNeighbor(k) != NULL)
-			{
-				if (!_triangulation.back().setNeighbor(container.getNeighbor(k)))
-					cout << "ERROR: setting a neighbor no-neighbor\n";
-			}
-		}
+	 // If neighbor exists, then set neighbor from the neighbor of the splitted triangle
+	 if (container.getNeighbor(k) != NULL)
+	 {
+	 if (!_triangulation.back().setNeighbor(container.getNeighbor(k)))
+	 cout << "ERROR: setting a neighbor no-neighbor\n";
+	 }
+	 }
 
-		// Set pending neighbors for new triangles
-		int j = firstAdded;
-		_triangulation[j].setNeighbor(&_triangulation[j + 1]);
-		_triangulation[j].setNeighbor(&_triangulation[j + 2]);
+	 // Set pending neighbors for new triangles
+	 int j = firstAdded;
+	 _triangulation[j].setNeighbor(&_triangulation[j + 1]);
+	 _triangulation[j].setNeighbor(&_triangulation[j + 2]);
 
-		_triangulation[j + 1].setNeighbor(&_triangulation[j]);
-		_triangulation[j + 1].setNeighbor(&_triangulation[j + 2]);
+	 _triangulation[j + 1].setNeighbor(&_triangulation[j]);
+	 _triangulation[j + 1].setNeighbor(&_triangulation[j + 2]);
 
-		_triangulation[j + 2].setNeighbor(&_triangulation[j]);
-		_triangulation[j + 2].setNeighbor(&_triangulation[j + 1]);
+	 _triangulation[j + 2].setNeighbor(&_triangulation[j]);
+	 _triangulation[j + 2].setNeighbor(&_triangulation[j + 1]);
 
-		// Update neighbors for already existing triangles
-		for (size_t t = firstAdded; t < _triangulation.size(); t++)
-		{
-			if (_triangulation[t].getNeighbor(0) != NULL)
-				_triangulation[t].getNeighbor(0)->setNeighbor(&_triangulation[t]);
+	 // Update neighbors for already existing triangles
+	 for (size_t t = firstAdded; t < _triangulation.size(); t++)
+	 {
+	 if (_triangulation[t].getNeighbor(0) != NULL)
+	 _triangulation[t].getNeighbor(0)->setNeighbor(&_triangulation[t]);
 
-			if (_triangulation[t].getNeighbor(1) != NULL)
-				_triangulation[t].getNeighbor(1)->setNeighbor(&_triangulation[t]);
+	 if (_triangulation[t].getNeighbor(1) != NULL)
+	 _triangulation[t].getNeighbor(1)->setNeighbor(&_triangulation[t]);
 
-			if (_triangulation[t].getNeighbor(2) != NULL)
-				_triangulation[t].getNeighbor(2)->setNeighbor(&_triangulation[t]);
-		}
+	 if (_triangulation[t].getNeighbor(2) != NULL)
+	 _triangulation[t].getNeighbor(2)->setNeighbor(&_triangulation[t]);
+	 }
 
-		// Delete replaced triangle
-		_triangulation.erase(_triangulation.begin() + _containerTriangles[0]);
+	 // Delete replaced triangle
+	 _triangulation.erase(_triangulation.begin() + _containerTriangles[0]);
 
-		// ACA HAY QUE CAMBIAR TODO ESTO POR USO DE MEMORIA DINAMICA YA QUE AL ELIMINAR O AGREGAR UN TRIANGULO
-		// DEL VECTOR LAS DIRECCIONES DE MEMORIA DE LOS ELEMENTOS PODRIAN CAMBIAR!!!
-	}
-	else
-	{
-		// This is the case when the point added is over an existing edge
-		string str = "collinear points!!\n";
-//		throw exception();
-	}
+	 // ACA HAY QUE CAMBIAR TODO ESTO POR USO DE MEMORIA DINAMICA YA QUE AL ELIMINAR O AGREGAR UN TRIANGULO
+	 // DEL VECTOR LAS DIRECCIONES DE MEMORIA DE LOS ELEMENTOS PODRIAN CAMBIAR!!!
+	 }
+	 else
+	 {
+	 // This is the case when the point added is over an existing edge
+	 string str = "collinear points!!\n";
+	 //		throw exception();
+	 }
 
-	printTriangulation(_triangulation);
-	*/
+	 printTriangulation(_triangulation);
+	 */
 
 	return vector<Triangle *>();
 }
@@ -162,9 +146,11 @@ int main(void)
 	vector<TrianglePtr> triangulation = vector<TrianglePtr>();
 
 	// Initial triangle for triangulation
-	triangulation.push_back(Helper::calculateSurroundingTriangle(vertexList));
+	TrianglePtr t0 = Helper::calculateSurroundingTriangle(vertexList);
+	triangulation.push_back(t0);
 
-	Triangle xx = *triangulation[0];
+	// Print initial state
+	Printer::printTriangulationAndVertices(triangulation, vertexList, "initial_state.png");
 
 	// Begin Delaunay's triangulation process
 //	queue<Vertex *> pending = generatePendingQueue(vertexList);

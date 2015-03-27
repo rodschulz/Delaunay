@@ -46,9 +46,11 @@ void Triangle::addInCCW(const VertexPtr &_vertex1, const VertexPtr &_vertex2, co
 	}
 }
 
-bool Triangle::contains(const Vertex *_vertex) const
+bool Triangle::contains(const VertexPtr &_vertex) const
 {
-	return (Helper::getOrientation(vertices[0].get(), vertices[1].get(), _vertex) >= 0) && (Helper::getOrientation(vertices[1].get(), vertices[2].get(), _vertex) >= 0) && (Helper::getOrientation(vertices[2].get(), vertices[0].get(), _vertex) >= 0);
+	return (Helper::getOrientation(vertices[0].get(), vertices[1].get(), _vertex.get()) >= 0)
+			&& (Helper::getOrientation(vertices[1].get(), vertices[2].get(), _vertex.get()) >= 0)
+			&& (Helper::getOrientation(vertices[2].get(), vertices[0].get(), _vertex.get()) >= 0);
 }
 
 bool Triangle::inEdge(const Vertex * _vertex) const
@@ -95,6 +97,7 @@ bool Triangle::isNeighbor(const Triangle *_t) const
 
 std::ostream &operator<<(std::ostream &_stream, const Triangle &_triangle)
 {
-	_stream << *_triangle.vertices[0] << "\n" << *_triangle.vertices[1] << "\n" << *_triangle.vertices[2] << "\n" << *_triangle.vertices[0] << "\n\n";
+	_stream << *_triangle.vertices[0] << "\n" << *_triangle.vertices[1] << "\n"
+	                << *_triangle.vertices[2] << "\n" << *_triangle.vertices[0] << "\n\n";
 	return _stream;
 }

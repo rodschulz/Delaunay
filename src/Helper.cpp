@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include "Printer.h"
 
 using namespace std;
 
@@ -109,4 +110,39 @@ TrianglePtr Helper::calculateSurroundingTriangle(const vector<VertexPtr> &_verte
 
 	TrianglePtr triangle(new Triangle(left, right, upper));
 	return triangle;
+}
+
+int Helper::shuffleGenerator(const int _i)
+{
+	return std::rand() % _i;
+}
+
+void Helper::printTriangulation(const vector<TrianglePtr> &_triangulation, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, _triangulation);
+
+	Printer::saveImage(_outputName, image);
+}
+
+void Helper::printSelectedTriangles(const vector<TrianglePtr> &_triangulation, const vector<TrianglePtr> &_selected, const VertexPtr &_vertex, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, _triangulation);
+	Printer::printSelectedTriangles(image, _selected);
+	Printer::printVertices(image, vector<VertexPtr>(1, _vertex));
+
+	Printer::saveImage(_outputName, image);
+}
+
+void Helper::printAll(const vector<TrianglePtr> &_triangulation, const vector<VertexPtr> &_vertices, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, _triangulation);
+	Printer::printVertices(image, _vertices);
+
+	Printer::saveImage(_outputName, image);
 }

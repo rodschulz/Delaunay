@@ -18,8 +18,11 @@ using namespace cv;
 class Printer
 {
 public:
-	static void printTriangulationAndVertices(const vector<TrianglePtr> &_triangulation, const vector <VertexPtr> &_vertices, const string _outputName);
-	static void printTriangulation(const vector<TrianglePtr> &_triangulation, const string _outputName);
+	static Mat generateBaseImage();
+	static void printVertices(Mat &_image, const vector<VertexPtr> &_vertices);
+	static void printTriangulation(Mat &_image, const vector<TrianglePtr> &_triangulation);
+	static void printSelectedTriangles(Mat &_image, const vector<TrianglePtr> &_selected);
+	static void saveImage(const string &_outputName, const Mat &_image);
 
 private:
 	Printer();
@@ -27,7 +30,6 @@ private:
 
 	static Point convert(const float _x, const float _y);
 	static Point convert(const Vertex &_vertex);
-	static Mat generateBaseImage();
-	static void drawTriangle(Mat &_image, const TrianglePtr &_triangle);
+	static void drawTriangle(Mat &_image, const TrianglePtr &_triangle, const Scalar &_color);
 	static void drawPoint(Mat &_image, const VertexPtr &_vertex);
 };

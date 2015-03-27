@@ -38,6 +38,24 @@ public:
 	 */
 	static TrianglePtr calculateSurroundingTriangle(const vector<VertexPtr> &_vertexList);
 
+	/**
+	 * Generator used to shuffle input data
+	 */
+	static int shuffleGenerator(const int _i);
+
+	/**
+	 * Prints the given triangulation
+	 */
+	static void printTriangulation(const vector<TrianglePtr> &_triangulation, const string &_outputName);
+	/**
+	 * Prints the triangulation along with the selected triangles
+	 */
+	static void printSelectedTriangles(const vector<TrianglePtr> &_triangulation, const vector<TrianglePtr> &_selected, const VertexPtr &_vertex, const string &_outputName);
+	/**
+	 * Prints triangulation and vertices
+	 */
+	static void printAll(const vector<TrianglePtr> &_triangulation, const vector<VertexPtr> &_vertices, const string &_outputName);
+
 private:
 	Helper()
 	{

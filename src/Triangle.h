@@ -28,7 +28,7 @@ public:
 	friend std::ostream &operator<<(std::ostream &_stream, const Triangle &_triangle);
 
 	// Checks if the given vertex is inside the current triangle
-	bool contains(const Vertex *_vertex) const;
+	bool contains(const VertexPtr &_vertex) const;
 	// Returns a boolean value indicating if the given vertex is in one of the triangle's edges
 	bool inEdge(const Vertex * _vertex) const;
 	// Sets the given triangle as a neighbor. If it doesn't share vertices, then it isn't set as neighbor.

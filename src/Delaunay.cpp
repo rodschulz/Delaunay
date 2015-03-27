@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
-#include <queue>
+#include <list>
 #include <exception>
 #include <fstream>
 #include "Helper.h"
@@ -17,39 +17,13 @@
 
 using namespace std;
 
-int getRandomInt(int max)
+vector<TrianglePtr> getContainerTriangles(const vector<TrianglePtr> &_triangulation, const VertexPtr &_target)
 {
-	return (rand() % (int) (max + 1));
-}
-
-queue<Vertex *> generatePendingQueue(const vector<Vertex> &_vertexList)
-{
-	vector<Vertex *> aux = vector<Vertex *>();
-	queue<Vertex *> pendingVertices = queue<Vertex *>();
-
-	// add all vertices to the auxiliary queue
-	for (size_t i = 0; i < _vertexList.size(); i++)
-		aux.push_back((Vertex *) &_vertexList[i]);
-
-	while (!aux.empty())
-	{
-		int index = getRandomInt(aux.size() - 1);
-		cout << "index: " << index << " vertex: " << *aux[index] << "\n";
-
-		pendingVertices.push(aux[index]);
-		aux.erase(aux.begin() + index);
-	}
-
-	return pendingVertices;
-}
-
-vector<int> getContainerTriangles(const vector<Triangle> &_triangulation, const Vertex *_target)
-{
-	vector<int> containers = vector<int>();
+	vector<TrianglePtr> containers = vector<TrianglePtr>();
 	for (size_t i = 0; i < _triangulation.size(); i++)
 	{
-		if (_triangulation[i].contains(_target))
-			containers.push_back(i);
+		if (_triangulation[i]->contains(_target))
+			containers.push_back(_triangulation[i]);
 
 		// stop if already 2 triangles were found
 		if (containers.size() == 2)
@@ -150,21 +124,23 @@ int main(void)
 	triangulation.push_back(t0);
 
 	// Print initial state
-	Printer::printTriangulationAndVertices(triangulation, vertexList, "initial_state.png");
+	Helper::printAll(triangulation, vertexList, "initial_state.png");
+
+	// Shuffle vertices before start adding
+	//std::random_shuffle(vertexList.begin(), vertexList.end(), Helper::shuffleGenerator);
 
 	// Begin Delaunay's triangulation process
-//	queue<Vertex *> pending = generatePendingQueue(vertexList);
-//	while (!pending.empty())
-//	{
-//		Vertex *nextVertex = pending.front();
-//
-//		// get the triangles surrounding the current point
-//		vector<int> containers = getContainerTriangles(triangulation, nextVertex);
+	for (size_t i = 0; i < vertexList.size(); i++)
+	{
+		VertexPtr next = vertexList[i];
+
+		// get the triangles surrounding the current point
+		vector<TrianglePtr> containers = getContainerTriangles(triangulation, next);
+		Helper::printSelectedTriangles(triangulation, containers, next, "selected_" + to_string(i) + ".png");
+
 //		vector<Triangle *> newTriangles = addNewTriangles(containers, triangulation, nextVertex);
 //		legalizeTriangles(newTriangles);
-//
-//		pending.pop();
-//	}
+	}
 
 	return EXIT_SUCCESS;
 }

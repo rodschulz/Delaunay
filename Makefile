@@ -1,7 +1,7 @@
 IS_DEBUG	= y
 
-# compiler and linker flags
-CXXFLAGS	= -Wall -Wextra -pedantic -Wno-unused-function -fmessage-length=0 -std=gnu++11
+# compiler and linker flags -std=c++0x
+CXXFLAGS	= -Wall -Wextra -pedantic -Wno-unused-function -fmessage-length=0 -std=gnu++11 
 LDFLAGS		= -lpthread -lm
 
 # enable/disable debug

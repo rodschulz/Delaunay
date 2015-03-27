@@ -38,21 +38,6 @@ int getRandomInt(int max)
 	return (rand() % (int) (max + 1));
 }
 
-vector<Vertex> generateVerticesList()
-{
-	vector<Vertex> list = vector<Vertex>();
-
-	list.push_back(Vertex(9, 6));
-	list.push_back(Vertex(4, 7));
-	list.push_back(Vertex(10, 2));
-	list.push_back(Vertex(6, 3));
-	list.push_back(Vertex(14, 8));
-	list.push_back(Vertex(14, 1));
-	list.push_back(Vertex(3, 2));
-
-	return list;
-}
-
 queue<Vertex *> generatePendingQueue(const vector<Vertex> &_vertexList)
 {
 	vector<Vertex *> aux = vector<Vertex *>();
@@ -92,15 +77,16 @@ vector<int> getContainerTriangles(const vector<Triangle> &_triangulation, const 
 
 vector<Triangle *> addNewTriangles(const vector<int> &_containerTriangles, vector<Triangle> &_triangulation, const Vertex *_vertex)
 {
+	/**
 	if (_containerTriangles.size() == 1)
 	{
-		/**
+		**
 		 * This is the case when the point added is inside a triangle
-		 */
+		 *
 
 		// Get data
 		Triangle container = _triangulation[_containerTriangles[0]];
-		vector<Vertex *> vertices = container.getVertices();
+		vector<VertexPtr> vertices = container.getVertices();
 
 		// Add new triangles
 		int firstAdded = _triangulation.size();
@@ -155,6 +141,7 @@ vector<Triangle *> addNewTriangles(const vector<int> &_containerTriangles, vecto
 	}
 
 	printTriangulation(_triangulation);
+	*/
 
 	return vector<Triangle *>();
 }
@@ -171,36 +158,27 @@ int main(void)
 	std::cout << "Start!\n";
 
 	// Generate lists with data
-	vector<Vertex> vertexList = generateVerticesList();
-	vector<Triangle> triangulation = vector<Triangle>();
+	vector<VertexPtr> vertexList = Helper::readInput("/media/rodrigo/Documents/UChile/Fall2015/CC72Y/Delaunay/input/input1");
+	vector<TrianglePtr> triangulation = vector<TrianglePtr>();
 
-	/**
-	 * generar triangulacion inicial con un rectangulo que encierra los puntos y luego correrse hacia
-	 * afuera un poco, buscar el centro del rectangulo por sobre el rectangulo (altura igual al
-	 * ancho) y con eso generar rectas para determinar el triangulo contenedor
-	 */
+	// Initial triangle for triangulation
+	triangulation.push_back(Helper::calculateSurroundingTriangle(vertexList));
 
-
-	// Set initial triangulation surrounding all the points
-	Vertex v1 = Vertex(-13,-4);
-	Vertex v2 = Vertex(9, 28);
-	Vertex v3 = Vertex(30, -4);
-	Triangle t0 = Triangle(&v1, &v3, &v2);
-	triangulation.push_back(t0);
+	Triangle xx = *triangulation[0];
 
 	// Begin Delaunay's triangulation process
-	queue<Vertex *> pending = generatePendingQueue(vertexList);
-	while (!pending.empty())
-	{
-		Vertex *nextVertex = pending.front();
-
-		// get the triangles surrounding the current point
-		vector<int> containers = getContainerTriangles(triangulation, nextVertex);
-		vector<Triangle *> newTriangles = addNewTriangles(containers, triangulation, nextVertex);
-		legalizeTriangles(newTriangles);
-
-		pending.pop();
-	}
+//	queue<Vertex *> pending = generatePendingQueue(vertexList);
+//	while (!pending.empty())
+//	{
+//		Vertex *nextVertex = pending.front();
+//
+//		// get the triangles surrounding the current point
+//		vector<int> containers = getContainerTriangles(triangulation, nextVertex);
+//		vector<Triangle *> newTriangles = addNewTriangles(containers, triangulation, nextVertex);
+//		legalizeTriangles(newTriangles);
+//
+//		pending.pop();
+//	}
 
 	return EXIT_SUCCESS;
 }

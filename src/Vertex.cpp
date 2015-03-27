@@ -5,6 +5,8 @@
 
 #include "Vertex.h"
 #include "Helper.h"
+#include <stdlib.h>
+#include <cmath>
 
 Vertex::Vertex()
 {
@@ -15,6 +17,12 @@ Vertex::Vertex(const float _x, const float _y)
 {
 	x = _x;
 	y = _y;
+}
+
+Vertex::Vertex(const Vertex &_other)
+{
+	x = _other.x;
+	y = _other.y;
 }
 
 Vertex::~Vertex()

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
-#include <list>
+#include <stack>
 #include <exception>
 #include <fstream>
 #include "Helper.h"
@@ -17,10 +17,10 @@
 
 using namespace std;
 
-enum debugLevel
+typedef enum DebugLevel
 {
 	DEBUG_LOW, DEBUG_MEDIUM, DEBUG_HIGH
-};
+} DebugLevel;
 
 pair<vector<TrianglePtr>, vector<int>> getContainerTriangles(const vector<TrianglePtr> &_triangulation, const VertexPtr &_target)
 {
@@ -42,9 +42,9 @@ pair<vector<TrianglePtr>, vector<int>> getContainerTriangles(const vector<Triang
 	return make_pair(triangles, indexes);
 }
 
-vector<TrianglePtr> addNewTriangles(const pair<vector<TrianglePtr>, vector<int>> &_containerTriangles, vector<TrianglePtr> &_triangulation, const VertexPtr &_vertex)
+stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<TrianglePtr>, vector<int>> &_containerTriangles, vector<TrianglePtr> &_triangulation, const VertexPtr &_vertex)
 {
-	vector<TrianglePtr> output = vector<TrianglePtr>();
+	stack<pair<TrianglePtr, TrianglePtr>> output = stack<pair<TrianglePtr, TrianglePtr>>();
 
 	if (_containerTriangles.first.size() == 1)
 	{
@@ -63,8 +63,9 @@ vector<TrianglePtr> addNewTriangles(const pair<vector<TrianglePtr>, vector<int>>
 			// Create new triangle and add it to the triangulation
 			TrianglePtr newTriangle(new Triangle(vertices[k], vertices[(k + 1) % 3], _vertex));
 			_triangulation.push_back(newTriangle);
+
 			// Also add the new triangle to the output vector
-			output.push_back(newTriangle);
+			output.push(make_pair(newTriangle, TrianglePtr(NULL)));
 
 			// If the container triangle has a neighbor in this side, then set it as a neighbor of the new triangle
 			if (container->getNeighbor(k) != NULL)
@@ -75,6 +76,9 @@ vector<TrianglePtr> addNewTriangles(const pair<vector<TrianglePtr>, vector<int>>
 				// Add the new to the neighbor
 				if (!container->getNeighbor(k)->setNeighbor(newTriangle))
 					cout << "ERROR: setting a neighbor no-neighbor\n";
+
+				// Update the neighbor in the output vector
+				output.top().second = container->getNeighbor(k);
 			}
 		}
 
@@ -110,11 +114,35 @@ vector<TrianglePtr> addNewTriangles(const pair<vector<TrianglePtr>, vector<int>>
 	return output;
 }
 
-void legalizeTriangles(vector<TrianglePtr> &_triangles)
+void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const vector<TrianglePtr> &_triangulation)
 {
-	for (size_t i = 0; i < _triangles.size(); i++)
+	static int legalizationCallCount = 0;
+
+	int loopCount = 0;
+	while (!_triangles.empty())
 	{
+		TrianglePtr addedTriangle = _triangles.top().first;
+		TrianglePtr neighbor = _triangles.top().second;
+		_triangles.pop();
+
+		if (neighbor != NULL)
+			cout << "legalizing edge " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
+
+		// Test if it's inside the circumcircle
+		if (neighbor.get() != NULL && addedTriangle->isInCircle(neighbor->getOppositeVertex(addedTriangle.get())))
+		{
+			cout << "flipping side " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
+
+			// If it's inside, then flip the common side
+			vector<pair<TrianglePtr, TrianglePtr>> flipped = addedTriangle->flipSide(neighbor);
+			for (size_t i = 0; i < flipped.size(); i++)
+				_triangles.push(flipped[i]);
+
+			Helper::printNeightbors(_triangulation, "legalizing_" + to_string(legalizationCallCount) + "_" + to_string(loopCount++), ".png");
+		}
 	}
+
+	legalizationCallCount++;
 }
 
 // Main method
@@ -123,10 +151,12 @@ int main(int _nargs, char ** _vargs)
 	// Clean output folder
 	system("exec rm -r ./output/*");
 
-	if (_nargs < 1)
+	if (_nargs < 2)
 		cout << "Not enough arguments given!";
 	else
 		cout << "Start!\n";
+
+	//DebugLevel level = (DebugLevel) atoi(_vargs[2]);
 
 	// Generate lists with data
 	vector<VertexPtr> vertexList = Helper::readInput(_vargs[1]);
@@ -153,17 +183,23 @@ int main(int _nargs, char ** _vargs)
 		Helper::printSelectedTriangles(triangulation, containers.first, next, "selected_" + to_string(i) + ".png");
 
 		// Add the new triangles according to the new vertex
-		vector<TrianglePtr> newTriangles = addNewTriangles(containers, triangulation, next);
+		stack<pair<TrianglePtr, TrianglePtr>> newTriangles = addNewTriangles(containers, triangulation, next);
 		Helper::printTriangulation(triangulation, "addedPoint_" + to_string(i) + ".png");
 
-		Helper::printNeightbors(triangulation, "neighbors_" + to_string(i), ".png");
-
 		// Legalize the new added triangles
-		legalizeTriangles(newTriangles);
+		legalizeTriangles(newTriangles, triangulation);
+		Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
 	}
 
 	// Print final state
 	Helper::printAll(triangulation, vertexList, "final_state.png");
+
+	// Remove super-triangle
+	//removeSuperTriangle(triagulation, t0);
+
+	Helper::printAll(triangulation, vertexList, "final_triangulation.png");
+
+	cout << "Execution finished!\n";
 
 	return EXIT_SUCCESS;
 }

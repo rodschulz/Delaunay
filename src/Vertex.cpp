@@ -13,7 +13,7 @@ Vertex::Vertex()
 	x = y = 0;
 }
 
-Vertex::Vertex(const float _x, const float _y)
+Vertex::Vertex(const double _x, const double _y)
 {
 	x = _x;
 	y = _y;

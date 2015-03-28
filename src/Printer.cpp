@@ -18,7 +18,8 @@ static Scalar BLACK = Scalar(0, 0, 0);
 static Scalar BLUE = Scalar(200, 0, 0);
 static Scalar GREEN = Scalar(0, 200, 0);
 static Scalar RED = Scalar(0, 0, 255);
-static Scalar YELLOW = Scalar(200, 200, 0);
+static Scalar LIGHT_BLUE = Scalar(200, 200, 0);
+static Scalar YELLOW = Scalar(0, 255, 255);
 
 Printer::Printer()
 {
@@ -28,7 +29,7 @@ Printer::~Printer()
 {
 }
 
-Point Printer::convert(const float _x, const float _y)
+Point Printer::convert(const double _x, const double _y)
 {
 	int x = toPixel(_x) + HORIZONTAL_OFFSET;
 	int y = VERTICAL_OFSET - toPixel(_y);
@@ -49,6 +50,9 @@ void Printer::drawTriangle(Mat &_image, const TrianglePtr &_triangle, const Scal
 	line(_image, p1, p2, _color);
 	line(_image, p2, p3, _color);
 	line(_image, p3, p1, _color);
+
+	pair<double, double> center = _triangle->getCenter();
+	putText(_image, to_string(_triangle->getId()), convert(center.first, center.second), CV_FONT_HERSHEY_SIMPLEX, 0.3, _color);
 }
 
 void Printer::drawPoint(Mat &_image, const VertexPtr &_vertex)
@@ -80,9 +84,9 @@ void Printer::printNeighbors(Mat &_image, const TrianglePtr &_triangle)
 	vector<Scalar> colors(0);
 	colors.push_back(RED);
 	colors.push_back(GREEN);
-	colors.push_back(YELLOW);
+	colors.push_back(LIGHT_BLUE);
 
-	pair<float, float> aux = _triangle->getCenter();
+	pair<double, double> aux = _triangle->getCenter();
 	Point center = convert(aux.first, aux.second);
 	vector<VertexPtr> vertices = _triangle->getVertices();
 
@@ -94,7 +98,7 @@ void Printer::printNeighbors(Mat &_image, const TrianglePtr &_triangle)
 			Point p2 = convert(*vertices[(k + 1) % 3]);
 			line(_image, p1, p2, colors[k]);
 
-			pair<float, float> neighborCenter = _triangle->getNeighbor(k)->getCenter();
+			pair<double, double> neighborCenter = _triangle->getNeighbor(k)->getCenter();
 			line(_image, center, convert(neighborCenter.first, neighborCenter.second), colors[k]);
 		}
 	}

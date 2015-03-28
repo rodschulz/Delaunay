@@ -15,7 +15,7 @@ public:
 	// Empty constructor
 	Vertex();
 	// Constructor
-	Vertex(float _x, float _y);
+	Vertex(double _x, double _y);
 	// Copy constructor
 	Vertex(const Vertex &_other);
 	// Destructor
@@ -28,32 +28,32 @@ public:
 	bool operator==(const Vertex &_other) const;
 
 	// Get x position
-	inline float getX() const
+	inline double getX() const
 	{
 		return x;
 	}
 
 	// Set x position
-	inline void setX(float x)
+	inline void setX(double x)
 	{
 		this->x = x;
 	}
 
 	// Get y position
-	inline float getY() const
+	inline double getY() const
 	{
 		return y;
 	}
 
 	// Set y position
-	inline void setY(float y)
+	inline void setY(double y)
 	{
 		this->y = y;
 	}
 
 private:
-	float x;
-	float y;
+	double x;
+	double y;
 };
 
 typedef shared_ptr<Vertex> VertexPtr;

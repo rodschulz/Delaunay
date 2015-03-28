@@ -69,10 +69,10 @@ vector<VertexPtr> Helper::readInput(const string &_location)
 
 TrianglePtr Helper::calculateSurroundingTriangle(const vector<VertexPtr> &_vertexList)
 {
-	float minX = numeric_limits<float>::infinity();
-	float maxX = -numeric_limits<float>::infinity();
-	float minY = numeric_limits<float>::infinity();
-	float maxY = -numeric_limits<float>::infinity();
+	double minX = numeric_limits<double>::infinity();
+	double maxX = -numeric_limits<double>::infinity();
+	double minY = numeric_limits<double>::infinity();
+	double maxY = -numeric_limits<double>::infinity();
 
 	for (VertexPtr v : _vertexList)
 	{
@@ -83,8 +83,8 @@ TrianglePtr Helper::calculateSurroundingTriangle(const vector<VertexPtr> &_verte
 		maxY = maxY < v.get()->getY() ? v.get()->getY() : maxY;
 	}
 
-	float width = maxX - minX;
-	float height = maxY - minY;
+	double width = maxX - minX;
+	double height = maxY - minY;
 
 	minX -= ceil(width / 4);
 	maxX += ceil(width / 4);
@@ -95,14 +95,14 @@ TrianglePtr Helper::calculateSurroundingTriangle(const vector<VertexPtr> &_verte
 	width = maxX - minX;
 	height = maxY - minY;
 
-	float upperVertexX = minX + (width / 2.0);
-	float upperVertexY = maxY + (max(width, height) / 2.0);
+	double upperVertexX = minX + (width / 2.0);
+	double upperVertexY = maxY + (max(width, height) / 2.0);
 
-	float leftVertexY = minY;
-	float leftVertexX = (leftVertexY - upperVertexY) * ((minX - upperVertexX) / (maxY - upperVertexY)) + upperVertexX;
+	double leftVertexY = minY;
+	double leftVertexX = (leftVertexY - upperVertexY) * ((minX - upperVertexX) / (maxY - upperVertexY)) + upperVertexX;
 
-	float rightVertexY = minY;
-	float rightVertexX = (rightVertexY - upperVertexY) * ((maxX - upperVertexX) / (maxY - upperVertexY)) + upperVertexX;
+	double rightVertexY = minY;
+	double rightVertexX = (rightVertexY - upperVertexY) * ((maxX - upperVertexX) / (maxY - upperVertexY)) + upperVertexX;
 
 	VertexPtr upper(new Vertex(upperVertexX, upperVertexY));
 	VertexPtr left(new Vertex(leftVertexX, leftVertexY));
@@ -156,4 +156,14 @@ void Helper::printNeightbors(const vector<TrianglePtr> &_triangulation, const st
 		Printer::printNeighbors(image, _triangulation[i]);
 		Printer::saveImage(_outputName + "_" + to_string(i) + _extension, image);
 	}
+}
+
+void Helper::printTriangle(const TrianglePtr &_triangle, const vector<VertexPtr> &_vertices, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, vector<TrianglePtr>(1,_triangle));
+	Printer::printVertices(image, _vertices);
+
+	Printer::saveImage(_outputName, image);
 }

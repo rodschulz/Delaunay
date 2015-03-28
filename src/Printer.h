@@ -36,7 +36,7 @@ private:
 	~Printer();
 
 	// Converts a point from xy coordinates to pixels
-	static Point convert(const float _x, const float _y);
+	static Point convert(const double _x, const double _y);
 	// Converts a vertex from xy coordinates to pixels
 	static Point convert(const Vertex &_vertex);
 	// Draws the given triangle in the given image

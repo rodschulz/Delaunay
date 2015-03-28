@@ -30,13 +30,27 @@ public:
 	// Checks if the given vertex is inside the current triangle
 	bool contains(const VertexPtr &_vertex) const;
 	// Returns a boolean value indicating if the given vertex is in one of the triangle's edges
-	bool inEdge(const Vertex * _vertex) const;
+	bool inEdge(const VertexPtr &_vertex) const;
 	// Sets the given triangle as a neighbor. If it doesn't share vertices, then it isn't set as neighbor.
 	bool setNeighbor(const TrianglePtr &_t);
 	// Returns a boolean value indicating if the given triangle is a neighbor
-	bool isNeighbor(const Triangle *_t) const;
+	bool isNeighbor(const TrianglePtr &_t) const;
 	// Returns the center (x,y) coordinates of the current triangle
-	pair<float, float> getCenter() const;
+	pair<double, double> getCenter() const;
+	// Returns a boolean value indicating if the given vertex is a vertex of this triangle (references comparison, not value)
+	bool isVertex(const VertexPtr &_vertex) const;
+	// Returns a boolean value indicating if the given vertex is inside the circle defined by this triangle or not
+	bool isInCircle(const VertexPtr &_vertex) const;
+	// Flips the common side with the given triangle
+	vector<pair<TrianglePtr, TrianglePtr>> flipSide(TrianglePtr &_neighbor);
+	// Returns the opposite vertex to the given neighbor
+	VertexPtr getOppositeVertex(const Triangle *_neighbor) const;
+
+	// Returns the triangle's id
+	inline long getId() const
+	{
+		return id;
+	}
 
 	// Returns the desired neighbor
 	inline TrianglePtr getNeighbor(const int index) const
@@ -64,5 +78,5 @@ private:
 	// Adds the vertices in CCW
 	void addInCCW(const VertexPtr &_vertex1, const VertexPtr &_vertex2, const VertexPtr &_vertex3);
 	// Id to make easier the identification of each triangle
-	unsigned long getId() const;
+	unsigned long getNextId() const;
 };

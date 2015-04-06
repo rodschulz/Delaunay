@@ -108,7 +108,28 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 		 * This is the case when a collinear point is added, that is the point is
 		 * placed right in an edge
 		 */
-		cout << "collinear point!!\n";
+		cout << "** Collinear point!\n";
+
+		for (size_t i = 0; i < _containerTriangles.first.size(); i++)
+		{
+			TrianglePtr container = _containerTriangles.first[i];
+			vector<VertexPtr> vertices = container->getVertices();
+
+			// Add new triangles
+			for (int k = 0; k < 3; k++)
+			{
+				if (!Helper::areCollinear(vertices[k].get(), vertices[(k + 1) % 3].get(), _vertex.get()))
+				{
+					// Create new triangle and add it to the triangulation
+					TrianglePtr newTriangle(new Triangle(vertices[k], vertices[(k + 1) % 3], _vertex));
+					_triangulation.push_back(newTriangle);
+				}
+			}
+		}
+
+		// Delete replaced triangles
+		//_triangulation.erase(_triangulation.begin() + _containerTriangles.second[0]);
+		//_triangulation.erase(_triangulation.begin() + _containerTriangles.second[1]);
 	}
 
 	return output;
@@ -185,6 +206,8 @@ int main(int _nargs, char ** _vargs)
 		// Add the new triangles according to the new vertex
 		stack<pair<TrianglePtr, TrianglePtr>> newTriangles = addNewTriangles(containers, triangulation, next);
 		Helper::printTriangulation(triangulation, "addedPoint_" + to_string(i) + ".png");
+
+		Helper::printNeightbors(triangulation, "triangulation" + to_string(i), ".png");
 
 		// Legalize the new added triangles
 		legalizeTriangles(newTriangles, triangulation);

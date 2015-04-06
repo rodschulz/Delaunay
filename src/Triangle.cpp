@@ -144,6 +144,7 @@ vector<pair<TrianglePtr, TrianglePtr>> Triangle::flipSide(TrianglePtr &_other)
 			break;
 	_other->vertices[j] = getOppositeVertex(_other.get());
 
+	// Since j is the pointer to this triangle, then store a pointer
 	TrianglePtr thisPonter = _other->neighbors[j];
 
 	vector<TrianglePtr> neighborsThis;
@@ -151,8 +152,10 @@ vector<pair<TrianglePtr, TrianglePtr>> Triangle::flipSide(TrianglePtr &_other)
 	neighborsThis.push_back(neighbors[(i + 1) % 3]);
 
 	vector<TrianglePtr> neighborsOther;
-	neighborsOther.push_back(_other->neighbors[(i + 2) % 3]);
-	neighborsOther.push_back(_other->neighbors[(i + 1) % 3]);
+	neighborsOther.push_back(_other->neighbors[(j + 2) % 3]);
+	neighborsOther.push_back(_other->neighbors[(j + 1) % 3]);
+
+	// TODO: put in the output vector only the 2 neighbors that must be checked
 
 	// Update neighbors in THIS triangle
 	setNeighbor(_other);
@@ -183,24 +186,6 @@ vector<pair<TrianglePtr, TrianglePtr>> Triangle::flipSide(TrianglePtr &_other)
 		_other->setNeighbor(neighborsOther[++j]);
 	neighborsOther[j]->setNeighbor(_other);
 	output.push_back(make_pair(_other, neighborsOther[j]));
-
-	/**
-	 // Update neighbors NOTE: (i + 2) % 3 == (i - 1) % 3
-	 TrianglePtr aux = neighbors[(i + 3) % 3];
-	 neighbors[(i + 3) % 3] = _other;
-	 neighbors[i] = _other->neighbors[(j + 3) % 3];
-
-	 _other->neighbors[(j + 3) % 3] = _other->neighbors[j];
-	 _other->neighbors[j] = aux;
-	 */
-
-
-	/**
-	// Push to check this triangle using the side that used to be the neighbor
-	output.push_back(make_pair(thisPonter, neighbors[i]));
-	// Push to check the neighbor using the side that used to be j + 1
-	output.push_back(make_pair(_other, _other->neighbors[(j + 1) % 3]));
-	*/
 
 	return output;
 }

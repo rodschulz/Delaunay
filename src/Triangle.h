@@ -6,6 +6,7 @@
 
 #include <vector>
 #include "Vertex.h"
+#include "Edge.h"
 #include <ostream>
 #include <memory>
 
@@ -45,6 +46,10 @@ public:
 	vector<pair<TrianglePtr, TrianglePtr>> flipSide(TrianglePtr &_neighbor);
 	// Returns the opposite vertex to the given neighbor
 	VertexPtr getOppositeVertex(const Triangle *_neighbor) const;
+	// Returns the n edge
+	Edge getEdge(const int _n) const;
+	//
+	bool hasEdge(const Edge &_edge) const;
 
 	// Returns the triangle's id
 	inline long getId() const
@@ -79,4 +84,6 @@ private:
 	void addInCCW(const VertexPtr &_vertex1, const VertexPtr &_vertex2, const VertexPtr &_vertex3);
 	// Id to make easier the identification of each triangle
 	unsigned long getNextId() const;
+	// Returns the index of the given neighbor
+	int getNeighborIndex(const Triangle *_neighbor) const;
 };

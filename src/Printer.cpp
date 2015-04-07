@@ -7,9 +7,9 @@
 #define OUTPUT_FOLDER		"./output/"
 #define WIDTH			1280
 #define HEIGHT			960
-#define CONVERSION_RATE		4 // this is X:1 meaning conversion pixels:unit
+#define CONVERSION_RATE		16 // this is X:1 meaning conversion pixels:unit
 #define HORIZONTAL_OFFSET	(WIDTH / 2)
-#define VERTICAL_OFSET		(HEIGHT / 2)
+#define VERTICAL_OFFSET		(HEIGHT / 2)
 #define toPixel(x)		((x) * CONVERSION_RATE)
 
 // Color used to draw triangles
@@ -19,7 +19,6 @@ static Scalar BLUE = Scalar(200, 0, 0);
 static Scalar GREEN = Scalar(0, 200, 0);
 static Scalar RED = Scalar(0, 0, 255);
 static Scalar LIGHT_BLUE = Scalar(200, 200, 0);
-static Scalar YELLOW = Scalar(0, 255, 255);
 
 Printer::Printer()
 {
@@ -32,7 +31,7 @@ Printer::~Printer()
 Point Printer::convert(const double _x, const double _y)
 {
 	int x = toPixel(_x) + HORIZONTAL_OFFSET;
-	int y = VERTICAL_OFSET - toPixel(_y);
+	int y = VERTICAL_OFFSET - toPixel(_y);
 	return Point(x, y);
 }
 
@@ -113,8 +112,46 @@ Mat Printer::generateBaseImage()
 {
 	Mat image(HEIGHT, WIDTH, CV_8UC3, LIGHT_GRAY);
 
-	line(image, Point(0, VERTICAL_OFSET), Point(WIDTH, VERTICAL_OFSET), BLACK);
+	line(image, Point(0, VERTICAL_OFFSET), Point(WIDTH, VERTICAL_OFFSET), BLACK);
 	line(image, Point(HORIZONTAL_OFFSET, 0), Point(HORIZONTAL_OFFSET, HEIGHT), BLACK);
+
+	int step = 2;
+	int tickSize = toPixel(0.3);
+	int position = step;
+	int tickOffsetH = 5;
+	int tickOffsetV = 10;
+
+	// X ticks
+	int pos = toPixel(position);
+	while (pos <= WIDTH)
+	{
+		line(image, Point(pos + HORIZONTAL_OFFSET, VERTICAL_OFFSET - tickSize), Point(pos + HORIZONTAL_OFFSET, VERTICAL_OFFSET + tickSize), BLACK);
+		putText(image, to_string(position), Point(pos + HORIZONTAL_OFFSET - tickOffsetH, VERTICAL_OFFSET + tickSize + tickOffsetV), CV_FONT_HERSHEY_SIMPLEX, 0.3, BLACK);
+
+		line(image, Point(HORIZONTAL_OFFSET - pos, VERTICAL_OFFSET - tickSize), Point(HORIZONTAL_OFFSET - pos, VERTICAL_OFFSET + tickSize), BLACK);
+		putText(image, to_string(-position), Point(HORIZONTAL_OFFSET - pos - tickOffsetH - 5, VERTICAL_OFFSET + tickSize + tickOffsetV), CV_FONT_HERSHEY_SIMPLEX, 0.3, BLACK);
+
+		position += step;
+		pos = toPixel(position);
+	}
+
+	position = step;
+	pos = toPixel(position);
+	tickOffsetH = 15;
+	tickOffsetV = 3;
+
+	// Y ticks
+	while (pos <= HEIGHT)
+	{
+		line(image, Point(HORIZONTAL_OFFSET - tickSize, VERTICAL_OFFSET - pos), Point(HORIZONTAL_OFFSET + tickSize, VERTICAL_OFFSET - pos), BLACK);
+		putText(image, to_string(position), Point(HORIZONTAL_OFFSET - tickSize - tickOffsetH, VERTICAL_OFFSET - pos + tickOffsetV), CV_FONT_HERSHEY_SIMPLEX, 0.3, BLACK);
+
+		line(image, Point(HORIZONTAL_OFFSET - tickSize, VERTICAL_OFFSET + pos), Point(HORIZONTAL_OFFSET + tickSize, VERTICAL_OFFSET + pos), BLACK);
+		putText(image, to_string(-position), Point(HORIZONTAL_OFFSET - tickSize - tickOffsetH - 10, VERTICAL_OFFSET + pos + tickOffsetV), CV_FONT_HERSHEY_SIMPLEX, 0.3, BLACK);
+
+		position += step;
+		pos = toPixel(position);
+	}
 
 	return image;
 }

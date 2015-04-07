@@ -207,7 +207,7 @@ int main(int _nargs, char ** _vargs)
 		stack<pair<TrianglePtr, TrianglePtr>> newTriangles = addNewTriangles(containers, triangulation, next);
 		Helper::printTriangulation(triangulation, "addedPoint_" + to_string(i) + ".png");
 
-		Helper::printNeightbors(triangulation, "triangulation" + to_string(i), ".png");
+		//Helper::printNeightbors(triangulation, "triangulation" + to_string(i), ".png");
 
 		// Legalize the new added triangles
 		legalizeTriangles(newTriangles, triangulation);

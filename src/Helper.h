@@ -8,14 +8,22 @@
 #include "Triangle.h"
 #include <string>
 #include <vector>
+#include <stdlib.h>
 
 using namespace std;
 
 #define COMPARISON_EPSILON	1E-10
 
+typedef enum DebugLevel
+{
+	NONE, LOW, MEDIUM, HIGH
+} DebugLevel;
+
 class Helper
 {
 public:
+	~Helper();
+
 	/**
 	 * Evaluates the orientation of the given points. If they are CCW, then
 	 * returns a value > 0, if they are CW then the value returned is < 0
@@ -58,20 +66,37 @@ public:
 	/**
 	 * Prints a series of images displaying the neighbors associated to each triangle
 	 */
-	static void printNeightbors(const vector<TrianglePtr> &_triangulation, const string &_outputName, const string &_extension);
+	static void printNeighbors(const vector<TrianglePtr> &_triangulation, const string &_outputName, const string &_extension);
 	/**
 	 * Prints the given triangle along with given vector of vertices
 	 */
 	static void printTriangle(const TrianglePtr &_triangle, const vector<VertexPtr> &_vertices, const string &_outputName);
+	/**
+	 * Returns the current value for the debug level
+	 */
+	static DebugLevel getDebugLevel();
+	/**
+	 * Set a new value for the debug level
+	 */
+	static void setDebugLevel(const DebugLevel &_level);
+	/**
+	 * Returns an instance of the singleton class Helper
+	 */
+	static Helper* getInstance()
+	{
+		static Helper *instance = new Helper();
+		return instance;
+	}
 
 private:
 	Helper()
 	{
+		level = NONE;
 	}
 	;
 
-	~Helper()
-	{
-	}
-	;
+	Helper(const Helper &_other);
+	void operator=(const Helper &_other);
+
+	DebugLevel level;
 };

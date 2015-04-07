@@ -141,137 +141,107 @@ vector<pair<TrianglePtr, TrianglePtr>> Triangle::flipSide(TrianglePtr &_other)
 	for (int k = 1; k < 3; k++)
 		neighborsThis.push_back(make_pair(neighbors[(i + k) % 3], getEdge((i + k) % 3)));
 
-	cout << "neighborThis: " << neighborsThis[0].second << " - id: " << neighborsThis[0].first->id << "\n";
-	cout << "neighborThis: " << neighborsThis[1].second << " - id: " << neighborsThis[1].first->id << "\n";
-
 	vector<pair<TrianglePtr, Edge>> neighborsOther;
 	for (int k = 1; k < 3; k++)
 		neighborsOther.push_back(make_pair(_other->neighbors[(j + k) % 3], _other->getEdge((j + k) % 3)));
-
-	cout << "neighborsOther: " << neighborsOther[0].second << " - id: " << neighborsOther[0].first->id << "\n";
-	cout << "neighborsOther: " << neighborsOther[1].second << " - id: " << neighborsOther[1].first->id << "\n";
 
 	// Update vertices
 	vertices[i] = _other->getOppositeVertex(this);
 	_other->vertices[j] = getOppositeVertex(_other.get());
 
-	cout << "this " << *this << "\n";
-	cout << "other " << *_other << "\n";
+	if (Helper::getDebugLevel() >= HIGH)
+	{
+		cout << "neighborThis > " << "id: " << neighborsThis[0].first->id << "  - vertices: " << neighborsThis[0].second << "\n";
+		cout << "neighborThis > " << "id: " << neighborsThis[1].first->id << "  - vertices: " << neighborsThis[1].second << "\n";
+		cout << "neighborsOther > " << "id: " << neighborsOther[0].first->id << "  - vertices: " << neighborsOther[0].second << "\n";
+		cout << "neighborsOther > " << "id: " << neighborsOther[1].first->id << "  - vertices: " << neighborsOther[1].second << "\n";
 
-	/*for (int k = 1; k < 3; k++)
-	 {
-	 if (neighbors[(i + k) % 3] != NULL)
-	 neighborsThis.push_back(neighbors[(i + k) % 3]);
-	 }
-
-	 vector<TrianglePtr> neighborsOther;
-	 for (int k = 1; k < 3; k++)
-	 {
-	 if (_other->neighbors[(j + k) % 3] != NULL)
-	 neighborsOther.push_back(_other->neighbors[(j + k) % 3]);
-	 }*/
+		cout << "this > " << *this << "\n";
+		cout << "other > " << *_other << "\n";
+	}
 
 	// TODO: put in the output vector only the 2 neighbors that must be checked
 	// Update neighbors in THIS triangle
 	setNeighbor(_other);
-	for (size_t k = 0; k < neighborsThis.size(); k++)
-	{
-		cout << "checking " << neighborsThis[k].second << "\n";
-		if (hasEdge(neighborsThis[k].second))
-		{
-			if (neighborsThis[k].first != NULL)
-			{
-				cout << "setting neighbor " << *neighborsThis[k].first << "\n";
+	pair<TrianglePtr, TrianglePtr> p1 = updateNeighbor(neighborsThis, thisPonter);
+	pair<TrianglePtr, TrianglePtr> p2 = updateNeighbor(neighborsOther, thisPonter);
 
-				setNeighbor(neighborsThis[k].first);
-				neighborsThis[k].first->setNeighbor(thisPonter);
-				output.push_back(make_pair(thisPonter, neighborsThis[k].first));
-			}
-			break;
-		}
-	}
-	for (size_t k = 0; k < neighborsOther.size(); k++)
-	{
-		cout << "checking " << neighborsOther[k].second << "\n";
+	_other->setNeighbor(thisPonter);
+	pair<TrianglePtr, TrianglePtr> p3 = _other->updateNeighbor(neighborsThis, _other);
+	pair<TrianglePtr, TrianglePtr> p4 = _other->updateNeighbor(neighborsOther, _other);
 
-		if (hasEdge(neighborsOther[k].second))
-		{
-			if (neighborsOther[k].first != NULL)
-			{
-				cout << "setting neighbor " << *neighborsOther[k].first << "\n";
-
-				setNeighbor(neighborsOther[k].first);
-				neighborsOther[k].first->setNeighbor(thisPonter);
-				output.push_back(make_pair(thisPonter, neighborsOther[k].first));
-			}
-			break;
-		}
-	}
+//	for (size_t k = 0; k < neighborsThis.size(); k++)
+//	{
+//		if (Helper::getDebugLevel() >= HIGH)
+//			cout << "Checking edge " << neighborsThis[k].second << "\n";
+//
+//		if (hasEdge(neighborsThis[k].second))
+//		{
+//			if (neighborsThis[k].first != NULL)
+//			{
+//				cout << "Setting neighbor > " << *neighborsThis[k].first << "\n";
+//
+//				setNeighbor(neighborsThis[k].first);
+//				neighborsThis[k].first->setNeighbor(thisPonter);
+//				output.push_back(make_pair(thisPonter, neighborsThis[k].first));
+//			}
+//			break;
+//		}
+//	}
+//	for (size_t k = 0; k < neighborsOther.size(); k++)
+//	{
+//		cout << "checking " << neighborsOther[k].second << "\n";
+//
+//		if (hasEdge(neighborsOther[k].second))
+//		{
+//			if (neighborsOther[k].first != NULL)
+//			{
+//				cout << "setting neighbor " << *neighborsOther[k].first << "\n";
+//
+//				setNeighbor(neighborsOther[k].first);
+//				neighborsOther[k].first->setNeighbor(thisPonter);
+//				output.push_back(make_pair(thisPonter, neighborsOther[k].first));
+//			}
+//			break;
+//		}
+//	}
 
 	// Update neighbors in OTHER triangle
-	_other->setNeighbor(thisPonter);
-	for (size_t k = 0; k < neighborsThis.size(); k++)
-	{
-		cout << "checking " << neighborsThis[k].second << "\n";
-
-		if (_other->hasEdge(neighborsThis[k].second))
-		{
-			if (neighborsThis[k].first != NULL)
-			{
-				cout << "setting neighbor " << *neighborsThis[k].first << "\n";
-
-				_other->setNeighbor(neighborsThis[k].first);
-				neighborsThis[k].first->setNeighbor(_other);
-				output.push_back(make_pair(_other, neighborsThis[k].first));
-			}
-			break;
-		}
-	}
-	for (size_t k = 0; k < neighborsOther.size(); k++)
-	{
-		cout << "checking " << neighborsOther[k].second << "\n";
-
-		if (_other->hasEdge(neighborsOther[k].second))
-		{
-			if (neighborsOther[k].first != NULL)
-			{
-				cout << "setting neighbor " << *neighborsOther[k].first << "\n";
-
-				_other->setNeighbor(neighborsOther[k].first);
-				neighborsOther[k].first->setNeighbor(_other);
-				output.push_back(make_pair(_other, neighborsOther[k].first));
-			}
-			break;
-		}
-	}
-
-	/*i = 0;
-	 if (!setNeighbor(neighborsThis[i]))
-	 setNeighbor(neighborsThis[++i]);
-	 neighborsThis[i]->setNeighbor(thisPonter);
-	 output.push_back(make_pair(thisPonter, neighborsThis[i]));
-
-	 i = 0;
-	 if (!setNeighbor(neighborsOther[i]))
-	 setNeighbor(neighborsOther[++i]);
-	 neighborsOther[i]->setNeighbor(thisPonter);
-	 output.push_back(make_pair(thisPonter, neighborsOther[i]));
-
-	 // Update neighbors in OTHER triangle
-	 _other->setNeighbor(thisPonter);
-
-	 j = 0;
-	 if (!_other->setNeighbor(neighborsThis[j]))
-	 _other->setNeighbor(neighborsThis[++j]);
-	 neighborsThis[j]->setNeighbor(_other);
-	 output.push_back(make_pair(_other, neighborsThis[j]));
-
-	 j = 0;
-	 if (!_other->setNeighbor(neighborsOther[j]))
-	 _other->setNeighbor(neighborsOther[++j]);
-	 neighborsOther[j]->setNeighbor(_other);
-	 output.push_back(make_pair(_other, neighborsOther[j]));
-	 */
+//	_other->setNeighbor(thisPonter);
+//	for (size_t k = 0; k < neighborsThis.size(); k++)
+//	{
+//		cout << "checking " << neighborsThis[k].second << "\n";
+//
+//		if (_other->hasEdge(neighborsThis[k].second))
+//		{
+//			if (neighborsThis[k].first != NULL)
+//			{
+//				cout << "setting neighbor " << *neighborsThis[k].first << "\n";
+//
+//				_other->setNeighbor(neighborsThis[k].first);
+//				neighborsThis[k].first->setNeighbor(_other);
+//				output.push_back(make_pair(_other, neighborsThis[k].first));
+//			}
+//			break;
+//		}
+//	}
+//	for (size_t k = 0; k < neighborsOther.size(); k++)
+//	{
+//		cout << "checking " << neighborsOther[k].second << "\n";
+//
+//		if (_other->hasEdge(neighborsOther[k].second))
+//		{
+//			if (neighborsOther[k].first != NULL)
+//			{
+//				cout << "setting neighbor " << *neighborsOther[k].first << "\n";
+//
+//				_other->setNeighbor(neighborsOther[k].first);
+//				neighborsOther[k].first->setNeighbor(_other);
+//				output.push_back(make_pair(_other, neighborsOther[k].first));
+//			}
+//			break;
+//		}
+//	}
 
 	return output;
 }
@@ -314,4 +284,28 @@ bool Triangle::hasEdge(const Edge &_edge) const
 	}
 
 	return false;
+}
+
+pair<TrianglePtr, TrianglePtr> Triangle::updateNeighbor(const vector<pair<TrianglePtr, Edge>> &_potentialNeighbors, const TrianglePtr &_instancePtr)
+{
+	for (size_t k = 0; k < _potentialNeighbors.size(); k++)
+	{
+		if (Helper::getDebugLevel() >= HIGH)
+			cout << "Checking edge " << _potentialNeighbors[k].second << "\n";
+
+		if (hasEdge(_potentialNeighbors[k].second))
+		{
+			if (_potentialNeighbors[k].first != NULL)
+			{
+				if (Helper::getDebugLevel() >= HIGH)
+					cout << "Setting neighbor > " << *_potentialNeighbors[k].first << "\n";
+
+				setNeighbor(_potentialNeighbors[k].first);
+				_potentialNeighbors[k].first->setNeighbor(_instancePtr);
+				return make_pair(_instancePtr, _potentialNeighbors[k].first);
+			}
+		}
+	}
+
+	return make_pair(TrianglePtr(NULL), TrianglePtr(NULL));
 }

@@ -14,6 +14,10 @@
 
 using namespace std;
 
+Helper::~Helper()
+{
+}
+
 double Helper::getOrientation(const Vertex *_v1, const Vertex *_v2, const Vertex *_v3)
 {
 	// This is the calculation of a determinant to evaluate the
@@ -147,7 +151,7 @@ void Helper::printAll(const vector<TrianglePtr> &_triangulation, const vector<Ve
 	Printer::saveImage(_outputName, image);
 }
 
-void Helper::printNeightbors(const vector<TrianglePtr> &_triangulation, const string &_outputName, const string &_extension)
+void Helper::printNeighbors(const vector<TrianglePtr> &_triangulation, const string &_outputName, const string &_extension)
 {
 	for (size_t i = 0; i < _triangulation.size(); i++)
 	{
@@ -162,8 +166,18 @@ void Helper::printTriangle(const TrianglePtr &_triangle, const vector<VertexPtr>
 {
 	Mat image = Printer::generateBaseImage();
 
-	Printer::printTriangulation(image, vector<TrianglePtr>(1,_triangle));
+	Printer::printTriangulation(image, vector<TrianglePtr>(1, _triangle));
 	Printer::printVertices(image, _vertices);
 
 	Printer::saveImage(_outputName, image);
+}
+
+DebugLevel Helper::getDebugLevel()
+{
+	return Helper::getInstance()->level;
+}
+
+void Helper::setDebugLevel(const DebugLevel &_level)
+{
+	Helper::getInstance()->level = _level;
 }

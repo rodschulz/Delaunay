@@ -48,7 +48,7 @@ public:
 	VertexPtr getOppositeVertex(const Triangle *_neighbor) const;
 	// Returns the n edge
 	Edge getEdge(const int _n) const;
-	//
+	// Check if the current triangle contains the given edge
 	bool hasEdge(const Edge &_edge) const;
 
 	// Returns the triangle's id
@@ -86,4 +86,6 @@ private:
 	unsigned long getNextId() const;
 	// Returns the index of the given neighbor
 	int getNeighborIndex(const Triangle *_neighbor) const;
+	// Performs the update task over the current triangle
+	pair<TrianglePtr, TrianglePtr> updateNeighbor(const vector<pair<TrianglePtr, Edge>> &_potentialNeighbors, const TrianglePtr &_instancePtr);
 };

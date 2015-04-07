@@ -17,11 +17,6 @@
 
 using namespace std;
 
-typedef enum DebugLevel
-{
-	DEBUG_LOW, DEBUG_MEDIUM, DEBUG_HIGH
-} DebugLevel;
-
 pair<vector<TrianglePtr>, vector<int>> getContainerTriangles(const vector<TrianglePtr> &_triangulation, const VertexPtr &_target)
 {
 	vector<TrianglePtr> triangles = vector<TrianglePtr>();
@@ -147,19 +142,20 @@ void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const 
 		_triangles.pop();
 
 		if (neighbor != NULL)
-			cout << "legalizing edge " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
+			cout << "Legalizing edge " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
 
 		// Test if it's inside the circumcircle
 		if (neighbor.get() != NULL && addedTriangle->isInCircle(neighbor->getOppositeVertex(addedTriangle.get())))
 		{
-			cout << "flipping side " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
+			cout << "Flipping edge " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
 
 			// If it's inside, then flip the common side
 			vector<pair<TrianglePtr, TrianglePtr>> flipped = addedTriangle->flipSide(neighbor);
 			for (size_t i = 0; i < flipped.size(); i++)
 				_triangles.push(flipped[i]);
 
-			Helper::printNeightbors(_triangulation, "legalizing_" + to_string(legalizationCallCount) + "_" + to_string(loopCount++), ".png");
+			if (Helper::getDebugLevel() >= MEDIUM)
+				Helper::printNeighbors(_triangulation, "legalizing_" + to_string(legalizationCallCount) + "_" + to_string(loopCount++), ".png");
 		}
 	}
 
@@ -177,7 +173,7 @@ int main(int _nargs, char ** _vargs)
 	else
 		cout << "Start!\n";
 
-	//DebugLevel level = (DebugLevel) atoi(_vargs[2]);
+	Helper::setDebugLevel(LOW);
 
 	// Generate lists with data
 	vector<VertexPtr> vertexList = Helper::readInput(_vargs[1]);
@@ -201,17 +197,19 @@ int main(int _nargs, char ** _vargs)
 
 		// Get the triangles surrounding the current point
 		pair<vector<TrianglePtr>, vector<int>> containers = getContainerTriangles(triangulation, next);
-		Helper::printSelectedTriangles(triangulation, containers.first, next, "selected_" + to_string(i) + ".png");
 
 		// Add the new triangles according to the new vertex
 		stack<pair<TrianglePtr, TrianglePtr>> newTriangles = addNewTriangles(containers, triangulation, next);
-		Helper::printTriangulation(triangulation, "addedPoint_" + to_string(i) + ".png");
+		if (Helper::getDebugLevel() >= LOW)
+			Helper::printTriangulation(triangulation, "addedPoint_" + to_string(i) + ".png");
 
-		//Helper::printNeightbors(triangulation, "triangulation" + to_string(i), ".png");
+		if (Helper::getDebugLevel() >= HIGH)
+			Helper::printNeighbors(triangulation, "triangulation" + to_string(i), ".png");
 
 		// Legalize the new added triangles
 		legalizeTriangles(newTriangles, triangulation);
-		Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
+		if (Helper::getDebugLevel() >= LOW)
+			Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
 	}
 
 	// Print final state

@@ -11,6 +11,7 @@
 #include <exception>
 #include <fstream>
 #include "Helper.h"
+#include "Config.h"
 #include "Vertex.h"
 #include "Triangle.h"
 #include "Printer.h"
@@ -154,7 +155,7 @@ void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const 
 			for (size_t i = 0; i < flipped.size(); i++)
 				_triangles.push(flipped[i]);
 
-			if (Helper::getDebugLevel() >= MEDIUM)
+			if (Config::getDebugLevel() >= MEDIUM)
 				Helper::printNeighbors(_triangulation, "legalizing_" + to_string(legalizationCallCount) + "_" + to_string(loopCount++), ".png");
 		}
 	}
@@ -173,7 +174,8 @@ int main(int _nargs, char ** _vargs)
 	else
 		cout << "Start!\n";
 
-	Helper::setDebugLevel(LOW);
+	// Load config
+	Config::load("./config/config");
 
 	// Generate lists with data
 	vector<VertexPtr> vertexList = Helper::readInput(_vargs[1]);
@@ -187,7 +189,8 @@ int main(int _nargs, char ** _vargs)
 	Helper::printAll(triangulation, vertexList, "initial_state.png");
 
 	// Shuffle vertices before start adding
-	//std::random_shuffle(vertexList.begin(), vertexList.end(), Helper::shuffleGenerator);
+	if (Config::randomizeInput())
+		std::random_shuffle(vertexList.begin(), vertexList.end(), Helper::shuffleGenerator);
 
 	// Begin Delaunay's triangulation process
 	for (size_t i = 0; i < vertexList.size(); i++)
@@ -200,15 +203,15 @@ int main(int _nargs, char ** _vargs)
 
 		// Add the new triangles according to the new vertex
 		stack<pair<TrianglePtr, TrianglePtr>> newTriangles = addNewTriangles(containers, triangulation, next);
-		if (Helper::getDebugLevel() >= LOW)
+		if (Config::getDebugLevel() >= LOW)
 			Helper::printTriangulation(triangulation, "addedPoint_" + to_string(i) + ".png");
 
-		if (Helper::getDebugLevel() >= HIGH)
+		if (Config::getDebugLevel() >= HIGH)
 			Helper::printNeighbors(triangulation, "triangulation" + to_string(i), ".png");
 
 		// Legalize the new added triangles
 		legalizeTriangles(newTriangles, triangulation);
-		if (Helper::getDebugLevel() >= LOW)
+		if (Config::getDebugLevel() >= LOW)
 			Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
 	}
 

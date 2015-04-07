@@ -14,6 +14,10 @@
 
 using namespace std;
 
+Helper::Helper()
+{
+}
+
 Helper::~Helper()
 {
 }
@@ -170,14 +174,4 @@ void Helper::printTriangle(const TrianglePtr &_triangle, const vector<VertexPtr>
 	Printer::printVertices(image, _vertices);
 
 	Printer::saveImage(_outputName, image);
-}
-
-DebugLevel Helper::getDebugLevel()
-{
-	return Helper::getInstance()->level;
-}
-
-void Helper::setDebugLevel(const DebugLevel &_level)
-{
-	Helper::getInstance()->level = _level;
 }

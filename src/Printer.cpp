@@ -7,7 +7,8 @@
 #define OUTPUT_FOLDER		"./output/"
 #define WIDTH			1280
 #define HEIGHT			960
-#define CONVERSION_RATE		16 // this is X:1 meaning conversion pixels:unit
+#define CONVERSION_RATE		4 // this is X:1 meaning conversion pixels:unit
+#define STEP			5
 #define HORIZONTAL_OFFSET	(WIDTH / 2)
 #define VERTICAL_OFFSET		(HEIGHT / 2)
 #define toPixel(x)		((x) * CONVERSION_RATE)
@@ -115,7 +116,7 @@ Mat Printer::generateBaseImage()
 	line(image, Point(0, VERTICAL_OFFSET), Point(WIDTH, VERTICAL_OFFSET), BLACK);
 	line(image, Point(HORIZONTAL_OFFSET, 0), Point(HORIZONTAL_OFFSET, HEIGHT), BLACK);
 
-	int step = 2;
+	int step = STEP;
 	int tickSize = toPixel(0.3);
 	int position = step;
 	int tickOffsetH = 5;

@@ -23,7 +23,7 @@ LDFLAGS		+= $(shell pkg-config --libs   opencv)
 BUILD_DIR	= build
 SOURCE_DIR	= src
 TARGET		= $(BUILD_DIR)/Delaunay
-OBJS		= $(BUILD_DIR)/Delaunay.o $(BUILD_DIR)/Vertex.o $(BUILD_DIR)/Triangle.o $(BUILD_DIR)/Helper.o $(BUILD_DIR)/Printer.o $(BUILD_DIR)/Edge.o
+OBJS		= $(BUILD_DIR)/Delaunay.o $(BUILD_DIR)/Vertex.o $(BUILD_DIR)/Triangle.o $(BUILD_DIR)/Helper.o $(BUILD_DIR)/Printer.o $(BUILD_DIR)/Edge.o $(BUILD_DIR)/Config.o
 
 # targets and rules
 .PHONY: all clean

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "Triangle.h"
 #include "Helper.h"
+#include "Config.h"
 #include <iostream>
 
 Triangle::Triangle(VertexPtr &_vertex1, VertexPtr &_vertex2, VertexPtr _vertex3)
@@ -149,7 +150,7 @@ vector<pair<TrianglePtr, TrianglePtr>> Triangle::flipSide(TrianglePtr &_other)
 	vertices[i] = _other->getOppositeVertex(this);
 	_other->vertices[j] = getOppositeVertex(_other.get());
 
-	if (Helper::getDebugLevel() >= HIGH)
+	if (Config::getDebugLevel() >= HIGH)
 	{
 		cout << "neighborThis > " << "id: " << neighborsThis[0].first->id << "  - vertices: " << neighborsThis[0].second << "\n";
 		cout << "neighborThis > " << "id: " << neighborsThis[1].first->id << "  - vertices: " << neighborsThis[1].second << "\n";
@@ -290,14 +291,14 @@ pair<TrianglePtr, TrianglePtr> Triangle::updateNeighbor(const vector<pair<Triang
 {
 	for (size_t k = 0; k < _potentialNeighbors.size(); k++)
 	{
-		if (Helper::getDebugLevel() >= HIGH)
+		if (Config::getDebugLevel() >= HIGH)
 			cout << "Checking edge " << _potentialNeighbors[k].second << "\n";
 
 		if (hasEdge(_potentialNeighbors[k].second))
 		{
 			if (_potentialNeighbors[k].first != NULL)
 			{
-				if (Helper::getDebugLevel() >= HIGH)
+				if (Config::getDebugLevel() >= HIGH)
 					cout << "Setting neighbor > " << *_potentialNeighbors[k].first << "\n";
 
 				setNeighbor(_potentialNeighbors[k].first);

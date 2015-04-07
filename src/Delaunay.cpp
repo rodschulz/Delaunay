@@ -106,6 +106,7 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 		 */
 		cout << "** Collinear point!\n";
 
+		int firstAdded = _triangulation.size();
 		for (size_t i = 0; i < _containerTriangles.first.size(); i++)
 		{
 			TrianglePtr container = _containerTriangles.first[i];
@@ -119,13 +120,43 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 					// Create new triangle and add it to the triangulation
 					TrianglePtr newTriangle(new Triangle(vertices[k], vertices[(k + 1) % 3], _vertex));
 					_triangulation.push_back(newTriangle);
+
+					// Also add the new triangle to the output vector
+					output.push(make_pair(newTriangle, TrianglePtr(NULL)));
+
+					if (container->getNeighbor(k) != NULL)
+					{
+						// Add the neighbor to the new
+						if (!newTriangle->setNeighbor(container->getNeighbor(k)))
+							cout << "ERROR: setting a neighbor no-neighbor\n";
+						// Add the new to the neighbor
+						if (!container->getNeighbor(k)->setNeighbor(newTriangle))
+							cout << "ERROR: setting a neighbor no-neighbor\n";
+
+						// Update the neighbor in the output vector
+						output.top().second = container->getNeighbor(k);
+					}
 				}
 			}
 		}
 
+		for (size_t i = firstAdded; i < _triangulation.size(); i++)
+		{
+			for (size_t j = firstAdded; j < _triangulation.size(); j++)
+			{
+				if (i == j)
+					continue;
+
+				_triangulation[i]->setNeighbor(_triangulation[j]);
+			}
+		}
+
 		// Delete replaced triangles
-		//_triangulation.erase(_triangulation.begin() + _containerTriangles.second[0]);
-		//_triangulation.erase(_triangulation.begin() + _containerTriangles.second[1]);
+		_triangulation.erase(_triangulation.begin() + _containerTriangles.second[0]);
+		int offset = _containerTriangles.second[0] < _containerTriangles.second[1] ? 1 : 0;
+		_triangulation.erase(_triangulation.begin() + _containerTriangles.second[1] - offset);
+
+		Helper::printNeighbors(_triangulation, "collinear", ".png");
 	}
 
 	return output;
@@ -174,7 +205,7 @@ int main(int _nargs, char ** _vargs)
 	else
 		cout << "Start!\n";
 
-	// Load config
+	// Load configuration
 	Config::load("./config/config");
 
 	// Generate lists with data

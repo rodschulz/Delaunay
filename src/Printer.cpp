@@ -7,7 +7,7 @@
 #define OUTPUT_FOLDER		"./output/"
 #define WIDTH			1280
 #define HEIGHT			960
-#define CONVERSION_RATE		4 // this is X:1 meaning conversion pixels:unit
+#define CONVERSION_RATE		8 // this is X:1 meaning conversion pixels:unit
 #define STEP			5
 #define HORIZONTAL_OFFSET	(WIDTH / 2)
 #define VERTICAL_OFFSET		(HEIGHT / 2)

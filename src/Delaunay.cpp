@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <map>
 #include <exception>
 #include <fstream>
 #include "Helper.h"
@@ -178,8 +179,6 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 		_triangulation.erase(_triangulation.begin() + _containerTriangles.second[0]);
 		int offset = _containerTriangles.second[0] < _containerTriangles.second[1] ? 1 : 0;
 		_triangulation.erase(_triangulation.begin() + _containerTriangles.second[1] - offset);
-
-		//Helper::printNeighbors(_triangulation, "collinear", ".png");
 	}
 
 	return output;
@@ -215,6 +214,47 @@ void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const 
 	}
 
 	legalizationCallCount++;
+}
+
+void removeSuperTriangle(vector<TrianglePtr> &_triangulation, const TrianglePtr &_t0)
+{
+	// Vector to hold the indices of the triangles using a vertex of T0
+	vector<size_t> indices;
+
+	// Build a map with references to the triangles using each vertex
+	vector<VertexPtr> vertex = _t0->getVertices();
+	for (size_t i = 0; i < _triangulation.size(); i++)
+	{
+		for (int k = 0; k < 3; k++)
+		{
+			if (_triangulation[i]->contains(vertex[k]))
+				indices.push_back(i);
+		}
+	}
+
+	// Sort and clean the indices vector
+	sort(indices.begin(), indices.end());
+	indices.erase(unique(indices.begin(), indices.end()), indices.end());
+
+	// Delete triangles using the indices
+	int offset = 0;
+	for (size_t i = 0; i < indices.size(); i++)
+	{
+		int index = indices[i] - offset;
+		TrianglePtr currentTriangle = _triangulation[index];
+
+		cout << "Removing triangle " << currentTriangle->getId() << "\n";
+
+		for (int k = 0; k < 3; k++)
+		{
+			TrianglePtr neighbor = currentTriangle->getNeighbor(k);
+			if (neighbor != NULL)
+				neighbor->removeNeighbor(currentTriangle);
+		}
+
+		_triangulation.erase(_triangulation.begin() + index);
+		offset++;
+	}
 }
 
 // Main method
@@ -273,7 +313,7 @@ int main(int _nargs, char ** _vargs)
 	Helper::printAll(triangulation, vertexList, "final_state.png");
 
 	// Remove super-triangle
-	//removeSuperTriangle(triagulation, t0);
+	removeSuperTriangle(triangulation, t0);
 
 	Helper::printAll(triangulation, vertexList, "final_triangulation.png");
 

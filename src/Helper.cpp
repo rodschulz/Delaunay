@@ -122,6 +122,7 @@ TrianglePtr Helper::calculateSurroundingTriangle(const vector<VertexPtr> &_verte
 
 int Helper::shuffleGenerator(const int _i)
 {
+	srand(time(NULL));
 	return std::rand() % _i;
 }
 

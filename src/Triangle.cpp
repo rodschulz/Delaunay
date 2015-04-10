@@ -259,3 +259,15 @@ pair<TrianglePtr, TrianglePtr> Triangle::updateNeighbor(const vector<pair<Triang
 
 	return make_pair(TrianglePtr(NULL), TrianglePtr(NULL));
 }
+
+void Triangle::removeNeighbor(const TrianglePtr &_neighbor)
+{
+	for (int k = 0; k < 3; k++)
+	{
+		if (neighbors[k] == _neighbor)
+		{
+			neighbors[k] = TrianglePtr(NULL);
+			break;
+		}
+	}
+}

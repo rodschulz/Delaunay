@@ -52,6 +52,8 @@ public:
 	Edge getEdge(const int _n) const;
 	// Check if the current triangle contains the given edge
 	bool hasEdge(const Edge &_edge) const;
+	// Removes the given neighbor from the current triangle
+	void removeNeighbor(const TrianglePtr &_neighbor);
 
 	// Returns the triangle's id
 	inline long getId() const

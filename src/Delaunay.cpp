@@ -52,6 +52,9 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 		TrianglePtr container = _containerTriangles.first[0];
 		vector<VertexPtr> vertices = container->getVertices();
 
+		if (Config::getDebugLevel() >= MEDIUM)
+			cout << "Container > " << *container << "\n";
+
 		// Add new triangles
 		int firstAdded = _triangulation.size();
 		for (int k = 0; k < 3; k++)
@@ -62,6 +65,9 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 
 			// Also add the new triangle to the output vector
 			output.push(make_pair(newTriangle, TrianglePtr(NULL)));
+
+			if (Config::getDebugLevel() >= LOW)
+				cout << "New triangle > " << *newTriangle << "\n";
 
 			// If the container triangle has a neighbor in this side, then set it as a neighbor of the new triangle
 			if (container->getNeighbor(k) != NULL)
@@ -75,6 +81,9 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 
 				// Update the neighbor in the output vector
 				output.top().second = container->getNeighbor(k);
+
+				if (Config::getDebugLevel() >= MEDIUM)
+					cout << "Neighbor added > " << output.top().second->getId() << "\n";
 			}
 		}
 
@@ -104,13 +113,19 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 		 * This is the case when a collinear point is added, that is the point is
 		 * placed right in an edge
 		 */
-		cout << "** Collinear point!\n";
 
+		if (Config::getDebugLevel() >= LOW)
+			cout << "** Collinear point!\n";
+
+		// First create the 4 new triangles
 		int firstAdded = _triangulation.size();
 		for (size_t i = 0; i < _containerTriangles.first.size(); i++)
 		{
 			TrianglePtr container = _containerTriangles.first[i];
 			vector<VertexPtr> vertices = container->getVertices();
+
+			if (Config::getDebugLevel() >= MEDIUM)
+				cout << "Container > " << *container << "\n";
 
 			// Add new triangles
 			for (int k = 0; k < 3; k++)
@@ -124,6 +139,9 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 					// Also add the new triangle to the output vector
 					output.push(make_pair(newTriangle, TrianglePtr(NULL)));
 
+					if (Config::getDebugLevel() >= LOW)
+						cout << "New triangle > " << *newTriangle << "\n";
+
 					if (container->getNeighbor(k) != NULL)
 					{
 						// Add the neighbor to the new
@@ -135,11 +153,15 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 
 						// Update the neighbor in the output vector
 						output.top().second = container->getNeighbor(k);
+
+						if (Config::getDebugLevel() >= MEDIUM)
+							cout << "Neighbor added > " << output.top().second->getId() << "\n";
 					}
 				}
 			}
 		}
 
+		// Set pointers going to the neighbors and coming from them
 		for (size_t i = firstAdded; i < _triangulation.size(); i++)
 		{
 			for (size_t j = firstAdded; j < _triangulation.size(); j++)
@@ -147,7 +169,8 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 				if (i == j)
 					continue;
 
-				_triangulation[i]->setNeighbor(_triangulation[j]);
+				if (_triangulation[i]->setNeighbor(_triangulation[j]) && Config::getDebugLevel() >= MEDIUM)
+					cout << "Neighbor added to " << _triangulation[i]->getId() << " > " << _triangulation[j]->getId() << "\n";
 			}
 		}
 
@@ -156,7 +179,7 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 		int offset = _containerTriangles.second[0] < _containerTriangles.second[1] ? 1 : 0;
 		_triangulation.erase(_triangulation.begin() + _containerTriangles.second[1] - offset);
 
-		Helper::printNeighbors(_triangulation, "collinear", ".png");
+		//Helper::printNeighbors(_triangulation, "collinear", ".png");
 	}
 
 	return output;
@@ -186,7 +209,7 @@ void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const 
 			for (size_t i = 0; i < flipped.size(); i++)
 				_triangles.push(flipped[i]);
 
-			if (Config::getDebugLevel() >= MEDIUM)
+			if (Config::getDebugLevel() >= HIGH)
 				Helper::printNeighbors(_triangulation, "legalizing_" + to_string(legalizationCallCount) + "_" + to_string(loopCount++), ".png");
 		}
 	}
@@ -227,7 +250,7 @@ int main(int _nargs, char ** _vargs)
 	for (size_t i = 0; i < vertexList.size(); i++)
 	{
 		VertexPtr next = vertexList[i];
-		cout << "Adding vertex " << *next << "\n";
+		cout << "+++++ Adding vertex " << to_string(i) << ": " << *next << "\n";
 
 		// Get the triangles surrounding the current point
 		pair<vector<TrianglePtr>, vector<int>> containers = getContainerTriangles(triangulation, next);
@@ -237,7 +260,7 @@ int main(int _nargs, char ** _vargs)
 		if (Config::getDebugLevel() >= LOW)
 			Helper::printTriangulation(triangulation, "addedPoint_" + to_string(i) + ".png");
 
-		if (Config::getDebugLevel() >= HIGH)
+		if (Config::getDebugLevel() >= MEDIUM)
 			Helper::printNeighbors(triangulation, "triangulation" + to_string(i), ".png");
 
 		// Legalize the new added triangles

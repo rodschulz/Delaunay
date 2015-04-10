@@ -34,6 +34,8 @@ public:
 	bool inEdge(const VertexPtr &_vertex) const;
 	// Sets the given triangle as a neighbor. If it doesn't share vertices, then it isn't set as neighbor.
 	bool setNeighbor(const TrianglePtr &_t);
+	// Sets the given triangle as a neighbor using the given edge (of this triangle). If they don't share the edge, then it isn't set as neighbor.
+	bool setNeighborByEdge(const TrianglePtr &_t, const Edge &_edge);
 	// Returns a boolean value indicating if the given triangle is a neighbor
 	bool isNeighbor(const TrianglePtr &_t) const;
 	// Returns the center (x,y) coordinates of the current triangle

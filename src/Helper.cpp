@@ -162,7 +162,7 @@ void Helper::printNeighbors(const vector<TrianglePtr> &_triangulation, const str
 		Mat image = Printer::generateBaseImage();
 		Printer::printTriangulation(image, _triangulation);
 		Printer::printNeighbors(image, _triangulation[i]);
-		Printer::saveImage(_outputName + "_" + to_string(i) + _extension, image);
+		Printer::saveImage(_outputName + "_" + to_string(_triangulation[i]->getId()) + _extension, image);
 	}
 }
 

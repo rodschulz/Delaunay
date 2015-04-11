@@ -230,7 +230,7 @@ void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const 
 void removeSuperTriangle(vector<TrianglePtr> &_triangulation, const TrianglePtr &_t0)
 {
 	// Vector to hold the indices of the triangles using a vertex of T0
-	vector<size_t> indices;
+	map<size_t, bool> indices;
 
 	// Build a map with references to the triangles using each vertex
 	vector<VertexPtr> vertex = _t0->getVertices();
@@ -238,41 +238,29 @@ void removeSuperTriangle(vector<TrianglePtr> &_triangulation, const TrianglePtr 
 	{
 		for (int k = 0; k < 3; k++)
 		{
-			if (_triangulation[i]->contains(vertex[k]))
-				indices.push_back(i);
+			if (_triangulation[i]->isVertex(vertex[k]))
+				indices[i] = true;
 		}
 	}
 
-	// Sort and clean the indices vector
-	sort(indices.begin(), indices.end());
-	indices.erase(unique(indices.begin(), indices.end()), indices.end());
-
-	// Delete triangles using the indices
-	int offset = 0;
-	for (size_t i = 0; i < indices.size(); i++)
+	// Remove triangles
+	vector<TrianglePtr> cleanTriangulation;
+	cleanTriangulation.reserve(_triangulation.size());
+	for (size_t i = 0; i < _triangulation.size(); i++)
 	{
-		int index = indices[i] - offset;
-		TrianglePtr currentTriangle = _triangulation[index];
-
-		cout << "Removing triangle " << currentTriangle->getId() << "\n";
-
-		for (int k = 0; k < 3; k++)
-		{
-			TrianglePtr neighbor = currentTriangle->getNeighbor(k);
-			if (neighbor != NULL)
-				neighbor->removeNeighbor(currentTriangle);
-		}
-
-		_triangulation.erase(_triangulation.begin() + index);
-		offset++;
+		if (indices.find(i) == indices.end())
+			cleanTriangulation.push_back(_triangulation[i]);
 	}
+
+	_triangulation = cleanTriangulation;
 }
 
 // Main method
 int main(int _nargs, char ** _vargs)
 {
 	// Clean output folder
-	system("exec rm -r ./output/*");
+	int result = system("exec rm -r ./output/*");
+	cout << result << "\n";
 
 	if (_nargs < 2)
 		cout << "Not enough arguments given!";
@@ -284,7 +272,13 @@ int main(int _nargs, char ** _vargs)
 
 	// Generate lists with data
 	vector<VertexPtr> vertexList = vector<VertexPtr>();
-	Helper::readInput(_vargs[1], vertexList);
+	if (Helper::isCommand(_vargs[1]))
+	{
+		vertexList.reserve(stoi(_vargs[2]));
+		Helper::generateRandomSet(stoi(_vargs[2]), stoi(_vargs[3]), stoi(_vargs[4]), stoi(_vargs[5]), stoi(_vargs[6]), vertexList);
+	}
+	else
+		Helper::readInput(_vargs[1], vertexList);
 
 	vector<TrianglePtr> triangulation = vector<TrianglePtr>();
 

@@ -1,4 +1,4 @@
-IS_DEBUG	= y
+IS_DEBUG	= n
 
 # compiler and linker flags
 CXXFLAGS	= -Wall -Wextra -pedantic -Wno-unused-function -fmessage-length=0 -std=gnu++11 

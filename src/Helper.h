@@ -61,6 +61,14 @@ public:
 	 * Prints the given triangle along with given vector of vertices
 	 */
 	static void printTriangle(const TrianglePtr &_triangle, const vector<VertexPtr> &_vertices, const string &_outputName);
+	/**
+	 * Checks if the given string is a command or not
+	 */
+	static bool isCommand(const string &_str);
+	/**
+	 * Generate a random set of points
+	 */
+	static void generateRandomSet(const int &_pointNumber, const int &_minX, const int &_maxX, const int &_minY, const int &_maxY, vector<VertexPtr> &_destination);
 
 private:
 	Helper();

@@ -68,7 +68,7 @@ void Helper::readInput(const string &_location, vector<VertexPtr> &_destination)
 		inputFile.close();
 	}
 	else
-		cout << "Unable to open input: " << _location;
+		cout << "Unable to open input: " << _location << "\n";
 }
 
 TrianglePtr Helper::calculateSurroundingTriangle(const vector<VertexPtr> &_vertexList)
@@ -171,4 +171,34 @@ void Helper::printTriangle(const TrianglePtr &_triangle, const vector<VertexPtr>
 	Printer::printVertices(image, _vertices);
 
 	Printer::saveImage(_outputName, image);
+}
+
+bool Helper::isCommand(const string &_str)
+{
+	return _str.at(0) == '-';
+}
+
+void Helper::generateRandomSet(const int &_pointNumber, const int &_minX, const int &_maxX, const int &_minY, const int &_maxY, vector<VertexPtr> &_destination)
+{
+	map<VertexPtr, bool> data;
+
+	srand(time(NULL));
+	double deltaX = _maxX - _minX;
+	double deltaY = _maxY - _minY;
+
+	int i = 0;
+	while (i < _pointNumber)
+	{
+		double x = (double) rand() / RAND_MAX;
+		double y = (double) rand() / RAND_MAX;
+
+		VertexPtr v = VertexPtr(new Vertex(_minX + x * deltaX, _minY + y * deltaY));
+
+		if (data.find(v) == data.end())
+		{
+			_destination.push_back(v);
+			data[v] = true;
+			i++;
+		}
+	}
 }

@@ -195,21 +195,32 @@ void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const 
 		TrianglePtr neighbor = _triangles.top().second;
 		_triangles.pop();
 
-		if (neighbor != NULL)
-			cout << "Legalizing edge " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
+		cout << "Legalizing edge " << addedTriangle->getId() << "-" << (neighbor != NULL ? to_string(neighbor->getId()) : "NULL") << "\n";
 
-		// Test if it's inside the circumcircle
-		if (neighbor.get() != NULL && addedTriangle->isInCircle(neighbor->getOppositeVertex(addedTriangle.get())))
+		if (neighbor.get() != NULL)
 		{
-			cout << "Flipping edge " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
+			if (!addedTriangle->isNeighbor(neighbor))
+			{
+				cout << "No neighbors edge, skipping\n";
+				continue;
+			}
 
-			// If it's inside, then flip the common side
-			vector<pair<TrianglePtr, TrianglePtr>> flipped = addedTriangle->flipSide(neighbor);
-			for (size_t i = 0; i < flipped.size(); i++)
-				_triangles.push(flipped[i]);
+			// Test if it's inside the circumcircle
+			if (addedTriangle->isInCircle(neighbor->getOppositeVertex(addedTriangle.get())))
+			{
+				cout << "Flipping edge " << addedTriangle->getId() << "-" << neighbor->getId() << "\n";
 
-			if (Config::getDebugLevel() >= HIGH)
-				Helper::printNeighbors(_triangulation, "legalizing_" + to_string(legalizationCallCount) + "_" + to_string(loopCount++), ".png");
+				// If it's inside, then flip the common side
+				vector<pair<TrianglePtr, TrianglePtr>> flipped = addedTriangle->flipSide(neighbor);
+				for (size_t i = 0; i < flipped.size(); i++)
+				{
+					cout << "Queueing check " << flipped[i].first->getId() << "-" << (flipped[i].second != NULL ? to_string(flipped[i].second->getId()) : "NULL") << "\n";
+					_triangles.push(flipped[i]);
+				}
+
+				if (Config::getDebugLevel() >= HIGH)
+					Helper::printNeighbors(_triangulation, "legalizing_" + to_string(legalizationCallCount) + "_" + to_string(loopCount++), ".png");
+			}
 		}
 	}
 
@@ -272,7 +283,9 @@ int main(int _nargs, char ** _vargs)
 	Config::load("./config/config");
 
 	// Generate lists with data
-	vector<VertexPtr> vertexList = Helper::readInput(_vargs[1]);
+	vector<VertexPtr> vertexList = vector<VertexPtr>();
+	Helper::readInput(_vargs[1], vertexList);
+
 	vector<TrianglePtr> triangulation = vector<TrianglePtr>();
 
 	// Initial triangle for triangulation
@@ -284,7 +297,9 @@ int main(int _nargs, char ** _vargs)
 
 	// Shuffle vertices before start adding
 	if (Config::randomizeInput())
+	{
 		std::random_shuffle(vertexList.begin(), vertexList.end(), Helper::shuffleGenerator);
+	}
 
 	// Begin Delaunay's triangulation process
 	for (size_t i = 0; i < vertexList.size(); i++)

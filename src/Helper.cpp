@@ -44,10 +44,8 @@ bool Helper::areCollinear(const Vertex *_v1, const Vertex *_v2, const Vertex *_v
 	return abs(getOrientation(_v1, _v2, _v3)) < COMPARISON_EPSILON;
 }
 
-vector<VertexPtr> Helper::readInput(const string &_location)
+void Helper::readInput(const string &_location, vector<VertexPtr> &_destination)
 {
-	vector<VertexPtr> input = vector<VertexPtr>();
-
 	string line;
 	ifstream inputFile;
 	inputFile.open(_location.c_str(), fstream::in);
@@ -65,14 +63,12 @@ vector<VertexPtr> Helper::readInput(const string &_location)
 			cout << "Vertex read: " << *newVertex << "\n";
 
 			// Add to vector
-			input.push_back(newVertex);
+			_destination.push_back(newVertex);
 		}
 		inputFile.close();
 	}
 	else
 		cout << "Unable to open input: " << _location;
-
-	return input;
 }
 
 TrianglePtr Helper::calculateSurroundingTriangle(const vector<VertexPtr> &_vertexList)

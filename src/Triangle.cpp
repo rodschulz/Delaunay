@@ -185,6 +185,11 @@ vector<pair<TrianglePtr, TrianglePtr>> Triangle::flipSide(TrianglePtr &_other)
 	pair<TrianglePtr, TrianglePtr> p3 = _other->updateNeighbor(neighborsThis, _other);
 	pair<TrianglePtr, TrianglePtr> p4 = _other->updateNeighbor(neighborsOther, _other);
 
+	output.push_back(p1);
+	output.push_back(p2);
+	output.push_back(p3);
+	output.push_back(p4);
+
 	return output;
 }
 

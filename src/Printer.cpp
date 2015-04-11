@@ -70,7 +70,12 @@ void Printer::printVertices(Mat &_image, const vector<VertexPtr> &_vertices)
 void Printer::printTriangulation(Mat &_image, const vector<TrianglePtr> &_triangulation)
 {
 	for (TrianglePtr t : _triangulation)
+	{
 		drawTriangle(_image, t, BLUE);
+		vector<VertexPtr> vertices = t->getVertices();
+		for (VertexPtr v : vertices)
+			drawPoint(_image, v);
+	}
 }
 
 void Printer::printSelectedTriangles(Mat &_image, const vector<TrianglePtr> &_selected)
@@ -122,7 +127,7 @@ Mat Printer::generateBaseImage()
 	int tickOffsetH = 5;
 	int tickOffsetV = 10;
 
-	// X ticks
+// X ticks
 	int pos = toPixel(position);
 	while (pos <= WIDTH)
 	{
@@ -141,7 +146,7 @@ Mat Printer::generateBaseImage()
 	tickOffsetH = 15;
 	tickOffsetV = 3;
 
-	// Y ticks
+// Y ticks
 	while (pos <= HEIGHT)
 	{
 		line(image, Point(HORIZONTAL_OFFSET - tickSize, VERTICAL_OFFSET - pos), Point(HORIZONTAL_OFFSET + tickSize, VERTICAL_OFFSET - pos), BLACK);

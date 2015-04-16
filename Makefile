@@ -1,4 +1,4 @@
-IS_DEBUG	= n
+IS_DEBUG	= y
 
 # compiler and linker flags
 CXXFLAGS	= -Wall -Wextra -pedantic -Wno-unused-function -fmessage-length=0 -std=gnu++11 
@@ -28,21 +28,18 @@ OBJS		= $(BUILD_DIR)/Delaunay.o $(BUILD_DIR)/Vertex.o $(BUILD_DIR)/Triangle.o $(
 # targets and rules
 .PHONY: all clean
 
-folder: $(BUILD_DIR)
-
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/%.h
+	mkdir -p $(BUILD_DIR)
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
 
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	mkdir -p $(BUILD_DIR)
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
 
 $(TARGET): $(OBJS)
 	$(CXX) -o $@ $^ $(CXXFLAGS) $(LDFLAGS) 
 
-all:	folder $(TARGET)
+all:	$(TARGET)
 
 clean:
 	rm -rf $(BUILD_DIR)/*

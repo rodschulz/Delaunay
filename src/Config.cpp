@@ -13,6 +13,7 @@ Config::Config()
 {
 	randomize = false;
 	debugLevel = NONE;
+	walkingMethod = STANDARD;
 }
 
 Config::~Config()
@@ -60,13 +61,17 @@ void Config::parse(const string _key, const string _value)
 			getInstance()->debugLevel = HIGH;
 	}
 	else if (_key.compare("randomizeInput") == 0)
-	{
 		getInstance()->randomize = _value.compare("true") == 0;
-	}
-
+	else if (_key.compare("walkingMethod") == 0)
+		getInstance()->walkingMethod = _value.compare("jumpandwalk") == 0 ? JUMP_AND_WALK : STANDARD;
 }
 
 bool Config::randomizeInput()
 {
 	return getInstance()->randomize;
+}
+
+WalkingMethod Config::getWalkingMethod()
+{
+	return getInstance()->walkingMethod;
 }

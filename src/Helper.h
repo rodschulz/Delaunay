@@ -69,7 +69,18 @@ public:
 	 * Generate a random set of points
 	 */
 	static void generateRandomSet(const int &_pointNumber, const int &_minX, const int &_maxX, const int &_minY, const int &_maxY, vector<VertexPtr> &_destination);
-
+	/**
+	 * Generates a random number between the given limits (inclusive)
+	 */
+	static int getRandomNumber(const int _min, const int _max);
+	/**
+	 * Calculates the euclidian distance a point and a vertex
+	 */
+	static double distance(const pair<double, double> &_p, const VertexPtr &_v);
+	/**
+	 * Writes the given set of vertices to the given filename
+	 */
+	static void writePoints(const vector<VertexPtr> &_vertexList, const string &_filename);
 private:
 	Helper();
 	Helper(const Helper &_other);

@@ -1,2 +1,3 @@
-debugLevel none
-randomizeInput true
+debugLevel	none
+walkingMethod	standard
+randomizeInput	true

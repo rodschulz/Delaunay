@@ -9,8 +9,9 @@
 #include <vector>
 #include <stack>
 #include <map>
-#include <exception>
 #include <fstream>
+#include <limits>
+#include <chrono>
 #include "Helper.h"
 #include "Config.h"
 #include "Vertex.h"
@@ -18,6 +19,7 @@
 #include "Printer.h"
 
 using namespace std;
+using namespace std::chrono;
 
 pair<vector<TrianglePtr>, vector<int>> getContainerTriangles(const vector<TrianglePtr> &_triangulation, const VertexPtr &_target)
 {
@@ -37,6 +39,51 @@ pair<vector<TrianglePtr>, vector<int>> getContainerTriangles(const vector<Triang
 	}
 
 	return make_pair(triangles, indexes);
+}
+
+pair<vector<TrianglePtr>, vector<int>> jumpAndWalk(const vector<TrianglePtr> &_triangulation, const VertexPtr &_target)
+{
+	vector<TrianglePtr> triangles = vector<TrianglePtr>();
+	vector<int> indices = vector<int>();
+	map<TrianglePtr, int> indexMap;
+
+	// Build a map with the triangles indices
+	for (size_t i = 0; i < _triangulation.size(); i++)
+		indexMap[_triangulation[i]] = i;
+
+	// Get the starting triangle randomly
+	TrianglePtr t = _triangulation[Helper::getRandomNumber(0, _triangulation.size() - 1)];
+	while (!t->contains(_target))
+	{
+		int index = Helper::getRandomNumber(0, 2);
+		for (int k = 0; k < 3; k++)
+		{
+			if (Helper::getOrientation(t->getVertex((index + k) % 3).get(), t->getVertex((index + k + 1) % 3).get(), _target.get()) < 0)
+			{
+				t = t->getNeighbor((index + k) % 3);
+				break;
+			}
+		}
+	}
+
+	triangles.push_back(t);
+	indices.push_back(indexMap[t]);
+
+	for (int k = 0; k < 3; k++)
+	{
+		TrianglePtr n = t->getNeighbor(k);
+		if (n == NULL)
+			continue;
+
+		if (n->contains(_target))
+		{
+			triangles.push_back(n);
+			indices.push_back(indexMap[n]);
+			break;
+		}
+	}
+
+	return make_pair(triangles, indices);
 }
 
 stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<TrianglePtr>, vector<int>> &_containerTriangles, vector<TrianglePtr> &_triangulation, const VertexPtr &_vertex)
@@ -255,17 +302,44 @@ void removeSuperTriangle(vector<TrianglePtr> &_triangulation, const TrianglePtr 
 	_triangulation = cleanTriangulation;
 }
 
+void preparePrinter(const TrianglePtr &_t0)
+{
+	double minX = numeric_limits<double>::max();
+	double maxX = -numeric_limits<double>::max();
+	double minY = numeric_limits<double>::max();
+	double maxY = -numeric_limits<double>::max();
+
+	for (int i = 0; i < 3; i++)
+	{
+		VertexPtr v = _t0->getVertex(i);
+		maxX = maxX < v->getX() ? v->getX() : maxX;
+		minX = minX > v->getX() ? v->getX() : minX;
+		maxY = maxY < v->getY() ? v->getY() : maxY;
+		minY = minY > v->getY() ? v->getY() : minY;
+	}
+
+	double width = (abs(maxX) > abs(minX) ? abs(maxX) : abs(minX)) * 2.0;
+	double height = (abs(maxY) > abs(minY) ? abs(maxY) : abs(minY)) * 2.0;
+
+	Printer::getInstance()->calculateConversionRate(width, height);
+}
+
 // Main method
 int main(int _nargs, char ** _vargs)
 {
-	// Clean output folder
-	int result = system("exec rm -r ./output/*");
-	cout << result << "\n";
-
 	if (_nargs < 2)
-		cout << "Not enough arguments given!";
+	{
+		cout << "Not enough arguments given!\nUsage:\n\tDelaunay [options] [<input_file>]\n\n";
+		cout << "Options:\n\t-r\trandom input generated using 5 parameters: number of points, ";
+		cout << "minimum X,\n\t\tmaximum X, minimum Y, maximum Y.\n\n";
+
+		return EXIT_FAILURE;
+	}
 	else
 		cout << "Start!\n";
+
+	// Clean output folder
+	cout << "Cleaning output folder (code: " << system("exec rm -rf ./output/*") << ")\n";
 
 	// Load configuration
 	Config::load("./config/config");
@@ -276,15 +350,19 @@ int main(int _nargs, char ** _vargs)
 	{
 		vertexList.reserve(stoi(_vargs[2]));
 		Helper::generateRandomSet(stoi(_vargs[2]), stoi(_vargs[3]), stoi(_vargs[4]), stoi(_vargs[5]), stoi(_vargs[6]), vertexList);
+
+		Helper::writePoints(vertexList, "./input/input7");
 	}
 	else
 		Helper::readInput(_vargs[1], vertexList);
 
-	vector<TrianglePtr> triangulation = vector<TrianglePtr>();
-
 	// Initial triangle for triangulation
 	TrianglePtr t0 = Helper::calculateSurroundingTriangle(vertexList);
+	vector<TrianglePtr> triangulation = vector<TrianglePtr>();
 	triangulation.push_back(t0);
+
+	// Prepare printer limits
+	preparePrinter(t0);
 
 	// Print initial state
 	Helper::printAll(triangulation, vertexList, "initial_state.png");
@@ -296,13 +374,25 @@ int main(int _nargs, char ** _vargs)
 	}
 
 	// Begin Delaunay's triangulation process
+	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	for (size_t i = 0; i < vertexList.size(); i++)
 	{
 		VertexPtr next = vertexList[i];
 		cout << "+++++ Adding vertex " << to_string(i) << ": " << *next << "\n";
 
+
+		se podría usar un mapa en vez de un vector para almacenar la triangulación y de esa forma las eliminaciones sería más simples
+		no se requeriría el índice y en consecuencia no se requeriría generar el mapa de índices en el jump and walk
+
 		// Get the triangles surrounding the current point
-		pair<vector<TrianglePtr>, vector<int>> containers = getContainerTriangles(triangulation, next);
+		pair<vector<TrianglePtr>, vector<int>> containers;
+		if (Config::getWalkingMethod() == JUMP_AND_WALK)
+			containers = jumpAndWalk(triangulation, next);
+		else
+			containers = getContainerTriangles(triangulation, next);
+
+		if (Config::getDebugLevel() >= MEDIUM)
+			Helper::printSelectedTriangles(triangulation, containers.first, next, "selectedTriangle" + to_string(i) + ".png");
 
 		// Add the new triangles according to the new vertex
 		stack<pair<TrianglePtr, TrianglePtr>> newTriangles = addNewTriangles(containers, triangulation, next);
@@ -317,16 +407,17 @@ int main(int _nargs, char ** _vargs)
 		if (Config::getDebugLevel() >= LOW)
 			Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
 	}
+	high_resolution_clock::time_point t2 = high_resolution_clock::now();
 
 	// Print final state
 	Helper::printAll(triangulation, vertexList, "final_state.png");
-
 	// Remove super-triangle
 	removeSuperTriangle(triangulation, t0);
-
+	// Print result
 	Helper::printAll(triangulation, vertexList, "final_triangulation.png");
 
-	cout << "Execution finished!\n";
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+	cout << "Triangulation done in " << duration << "[us] using method " << Config::getWalkingMethod() << "\n";
 
 	return EXIT_SUCCESS;
 }

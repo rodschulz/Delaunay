@@ -30,11 +30,20 @@ public:
 	static void printNeighbors(Mat &_image, const TrianglePtr &_triangle);
 	// Saves the given image to disk
 	static void saveImage(const string &_outputName, const Mat &_image);
+	// Returns an instance of the current singleton printer class
+	static Printer *getInstance();
+	// Calculates the conversion rate according to the given dimensions
+	void calculateConversionRate(const double _width, const double _height);
 
 private:
 	Printer();
 	~Printer();
 
+	double conversionRate;
+	int step;
+
+	// Converts the given value to its pixel equivalent
+	int toPixel(const double _value) const;
 	// Converts a point from xy coordinates to pixels
 	static Point convert(const double _x, const double _y);
 	// Converts a vertex from xy coordinates to pixels

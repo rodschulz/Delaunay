@@ -7,11 +7,8 @@
 #define OUTPUT_FOLDER		"./output/"
 #define WIDTH			1280
 #define HEIGHT			960
-#define CONVERSION_RATE		8 // this is X:1 meaning conversion pixels:unit
-#define STEP			5
 #define HORIZONTAL_OFFSET	(WIDTH / 2)
 #define VERTICAL_OFFSET		(HEIGHT / 2)
-#define toPixel(x)		((x) * CONVERSION_RATE)
 
 // Color used to draw triangles
 static Scalar LIGHT_GRAY = Scalar(190, 190, 190);
@@ -23,6 +20,8 @@ static Scalar LIGHT_BLUE = Scalar(200, 200, 0);
 
 Printer::Printer()
 {
+	conversionRate = 4;
+	step = 5;
 }
 
 Printer::~Printer()
@@ -31,8 +30,9 @@ Printer::~Printer()
 
 Point Printer::convert(const double _x, const double _y)
 {
-	int x = toPixel(_x) + HORIZONTAL_OFFSET;
-	int y = VERTICAL_OFFSET - toPixel(_y);
+	Printer* printer = getInstance();
+	int x = printer->toPixel(_x) + HORIZONTAL_OFFSET;
+	int y = VERTICAL_OFFSET - printer->toPixel(_y);
 	return Point(x, y);
 }
 
@@ -116,19 +116,20 @@ void Printer::saveImage(const string &_outputName, const Mat &_image)
 
 Mat Printer::generateBaseImage()
 {
+	Printer* printer = getInstance();
 	Mat image(HEIGHT, WIDTH, CV_8UC3, LIGHT_GRAY);
 
 	line(image, Point(0, VERTICAL_OFFSET), Point(WIDTH, VERTICAL_OFFSET), BLACK);
 	line(image, Point(HORIZONTAL_OFFSET, 0), Point(HORIZONTAL_OFFSET, HEIGHT), BLACK);
 
-	int step = STEP;
-	int tickSize = toPixel(0.3);
+	int step = getInstance()->step;
+	int tickSize = printer->toPixel(0.3);
 	int position = step;
 	int tickOffsetH = 5;
 	int tickOffsetV = 10;
 
-// X ticks
-	int pos = toPixel(position);
+	// X ticks
+	int pos = printer->toPixel(position);
 	while (pos <= WIDTH)
 	{
 		line(image, Point(pos + HORIZONTAL_OFFSET, VERTICAL_OFFSET - tickSize), Point(pos + HORIZONTAL_OFFSET, VERTICAL_OFFSET + tickSize), BLACK);
@@ -138,15 +139,15 @@ Mat Printer::generateBaseImage()
 		putText(image, to_string(-position), Point(HORIZONTAL_OFFSET - pos - tickOffsetH - 5, VERTICAL_OFFSET + tickSize + tickOffsetV), CV_FONT_HERSHEY_SIMPLEX, 0.3, BLACK);
 
 		position += step;
-		pos = toPixel(position);
+		pos = printer->toPixel(position);
 	}
 
 	position = step;
-	pos = toPixel(position);
+	pos = printer->toPixel(position);
 	tickOffsetH = 15;
 	tickOffsetV = 3;
 
-// Y ticks
+	// Y ticks
 	while (pos <= HEIGHT)
 	{
 		line(image, Point(HORIZONTAL_OFFSET - tickSize, VERTICAL_OFFSET - pos), Point(HORIZONTAL_OFFSET + tickSize, VERTICAL_OFFSET - pos), BLACK);
@@ -156,8 +157,35 @@ Mat Printer::generateBaseImage()
 		putText(image, to_string(-position), Point(HORIZONTAL_OFFSET - tickSize - tickOffsetH - 10, VERTICAL_OFFSET + pos + tickOffsetV), CV_FONT_HERSHEY_SIMPLEX, 0.3, BLACK);
 
 		position += step;
-		pos = toPixel(position);
+		pos = printer->toPixel(position);
 	}
 
 	return image;
+}
+
+Printer *Printer::getInstance()
+{
+	static Printer *instance = new Printer();
+	return instance;
+}
+
+void Printer::calculateConversionRate(const double _width, const double _height)
+{
+	double horizontalRate = WIDTH / _width;
+	double verticalRate = HEIGHT / _height;
+
+	step = 50;
+	if (horizontalRate < verticalRate)
+	{
+		conversionRate = horizontalRate;
+	}
+	else
+	{
+		conversionRate = verticalRate;
+	}
+}
+
+int Printer::toPixel(const double _value) const
+{
+	return (int) (_value * conversionRate);
 }

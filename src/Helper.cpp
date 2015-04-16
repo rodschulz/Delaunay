@@ -202,3 +202,30 @@ void Helper::generateRandomSet(const int &_pointNumber, const int &_minX, const 
 		}
 	}
 }
+
+int Helper::getRandomNumber(const int _min, const int _max)
+{
+	srand(time(NULL));
+	int number = _min + (rand() % (int) (_max - _min + 1));
+	return number;
+}
+
+double Helper::distance(const pair<double, double> &_p, const VertexPtr &_v)
+{
+	double deltaX = _p.first - _v->getX();
+	double deltaY = _p.second - _v->getY();
+
+	return sqrt(deltaX * deltaX + deltaY * deltaY);
+}
+
+void Helper::writePoints(const vector<VertexPtr> &_vertexList, const string &_filename)
+{
+	ofstream stream;
+	stream.open(_filename.c_str(), fstream::out);
+
+	for (VertexPtr v : _vertexList)
+		stream << v->getX() << "\t" << v->getY() << "\n";
+
+	stream.close();
+}
+

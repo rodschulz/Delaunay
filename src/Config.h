@@ -13,6 +13,11 @@ typedef enum DebugLevel
 	NONE, LOW, MEDIUM, HIGH
 } DebugLevel;
 
+typedef enum WalkingMethod
+{
+	STANDARD, JUMP_AND_WALK
+} WalkingMethod;
+
 class Config
 {
 public:
@@ -30,6 +35,8 @@ public:
 	static DebugLevel getDebugLevel();
 	// Returns a boolean value indicating if inputs has to be randomized
 	static bool randomizeInput();
+	// Returns the walking method to be used
+	static WalkingMethod getWalkingMethod();
 
 private:
 	Config();
@@ -38,5 +45,6 @@ private:
 
 	bool randomize;
 	DebugLevel debugLevel;
+	WalkingMethod walkingMethod;
 };
 

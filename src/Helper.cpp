@@ -131,7 +131,27 @@ void Helper::printTriangulation(const vector<TrianglePtr> &_triangulation, const
 	Printer::saveImage(_outputName, image);
 }
 
+void Helper::printTriangulation(const map<TrianglePtr, bool> &_triangulation, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, _triangulation);
+
+	Printer::saveImage(_outputName, image);
+}
+
 void Helper::printSelectedTriangles(const vector<TrianglePtr> &_triangulation, const vector<TrianglePtr> &_selected, const VertexPtr &_vertex, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, _triangulation);
+	Printer::printSelectedTriangles(image, _selected);
+	Printer::printVertices(image, vector<VertexPtr>(1, _vertex));
+
+	Printer::saveImage(_outputName, image);
+}
+
+void Helper::printSelectedTriangles(const map<TrianglePtr, bool> &_triangulation, const vector<TrianglePtr> &_selected, const VertexPtr &_vertex, const string &_outputName)
 {
 	Mat image = Printer::generateBaseImage();
 
@@ -152,6 +172,16 @@ void Helper::printAll(const vector<TrianglePtr> &_triangulation, const vector<Ve
 	Printer::saveImage(_outputName, image);
 }
 
+void Helper::printAll(const map<TrianglePtr, bool> &_triangulation, const vector<VertexPtr> &_vertices, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, _triangulation);
+	Printer::printVertices(image, _vertices);
+
+	Printer::saveImage(_outputName, image);
+}
+
 void Helper::printNeighbors(const vector<TrianglePtr> &_triangulation, const string &_outputName, const string &_extension)
 {
 	for (size_t i = 0; i < _triangulation.size(); i++)
@@ -160,6 +190,19 @@ void Helper::printNeighbors(const vector<TrianglePtr> &_triangulation, const str
 		Printer::printTriangulation(image, _triangulation);
 		Printer::printNeighbors(image, _triangulation[i]);
 		Printer::saveImage(_outputName + "_" + to_string(_triangulation[i]->getId()) + _extension, image);
+	}
+}
+
+void Helper::printNeighbors(const map<TrianglePtr, bool> &_triangulation, const string &_outputName, const string &_extension)
+{
+	Mat base = Printer::generateBaseImage();
+	Printer::printTriangulation(base, _triangulation);
+
+	for (pair<TrianglePtr, bool> pair : _triangulation)
+	{
+		Mat image = base.clone();
+		Printer::printNeighbors(image, pair.first);
+		Printer::saveImage(_outputName + "_" + to_string(pair.first->getId()) + _extension, image);
 	}
 }
 

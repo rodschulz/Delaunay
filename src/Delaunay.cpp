@@ -21,38 +21,33 @@
 using namespace std;
 using namespace std::chrono;
 
-pair<vector<TrianglePtr>, vector<int>> getContainerTriangles(const vector<TrianglePtr> &_triangulation, const VertexPtr &_target)
+vector<TrianglePtr> getContainerTriangles(const map<TrianglePtr, bool> &_triangulation, const VertexPtr &_target)
 {
 	vector<TrianglePtr> triangles = vector<TrianglePtr>();
-	vector<int> indexes = vector<int>();
-	for (size_t i = 0; i < _triangulation.size(); i++)
+	for (pair<TrianglePtr, bool> pair : _triangulation)
 	{
-		if (_triangulation[i]->contains(_target))
-		{
-			triangles.push_back(_triangulation[i]);
-			indexes.push_back(i);
-		}
+		if (pair.first->contains(_target))
+			triangles.push_back(pair.first);
 
 		// stop if already 2 triangles were found
 		if (triangles.size() == 2)
 			break;
 	}
 
-	return make_pair(triangles, indexes);
+	return triangles;
 }
 
-pair<vector<TrianglePtr>, vector<int>> jumpAndWalk(const vector<TrianglePtr> &_triangulation, const VertexPtr &_target)
+vector <TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, const VertexPtr &_target)
 {
 	vector<TrianglePtr> triangles = vector<TrianglePtr>();
-	vector<int> indices = vector<int>();
-	map<TrianglePtr, int> indexMap;
-
-	// Build a map with the triangles indices
-	for (size_t i = 0; i < _triangulation.size(); i++)
-		indexMap[_triangulation[i]] = i;
 
 	// Get the starting triangle randomly
-	TrianglePtr t = _triangulation[Helper::getRandomNumber(0, _triangulation.size() - 1)];
+	int randomIndex = Helper::getRandomNumber(0, _triangulation.size() - 1);
+	map<TrianglePtr, bool>::const_iterator it = _triangulation.begin();
+	std::advance(it, randomIndex);
+	TrianglePtr t = it->first;
+
+	// Iterate searching
 	while (!t->contains(_target))
 	{
 		int index = Helper::getRandomNumber(0, 2);
@@ -67,7 +62,6 @@ pair<vector<TrianglePtr>, vector<int>> jumpAndWalk(const vector<TrianglePtr> &_t
 	}
 
 	triangles.push_back(t);
-	indices.push_back(indexMap[t]);
 
 	for (int k = 0; k < 3; k++)
 	{
@@ -78,38 +72,40 @@ pair<vector<TrianglePtr>, vector<int>> jumpAndWalk(const vector<TrianglePtr> &_t
 		if (n->contains(_target))
 		{
 			triangles.push_back(n);
-			indices.push_back(indexMap[n]);
 			break;
 		}
 	}
 
-	return make_pair(triangles, indices);
+	return triangles;
 }
 
-stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<TrianglePtr>, vector<int>> &_containerTriangles, vector<TrianglePtr> &_triangulation, const VertexPtr &_vertex)
+stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const vector<TrianglePtr> &_containerTriangles, map<TrianglePtr, bool> &_triangulation, const VertexPtr &_vertex)
 {
 	stack<pair<TrianglePtr, TrianglePtr>> output = stack<pair<TrianglePtr, TrianglePtr>>();
 
-	if (_containerTriangles.first.size() == 1)
+	if (_containerTriangles.size() == 1)
 	{
 		/**
 		 * This is the case when the point added is inside a triangle
 		 */
 
 		// Get data
-		TrianglePtr container = _containerTriangles.first[0];
+		TrianglePtr container = _containerTriangles[0];
 		vector<VertexPtr> vertices = container->getVertices();
 
 		if (Config::getDebugLevel() >= MEDIUM)
 			cout << "Container > " << *container << "\n";
 
 		// Add new triangles
-		int firstAdded = _triangulation.size();
+		vector <TrianglePtr> addedTriangles;
 		for (int k = 0; k < 3; k++)
 		{
 			// Create new triangle and add it to the triangulation
 			TrianglePtr newTriangle(new Triangle(vertices[k], vertices[(k + 1) % 3], _vertex));
-			_triangulation.push_back(newTriangle);
+			_triangulation[newTriangle] = true;
+
+			// Save a reference for later
+			addedTriangles.push_back(newTriangle);
 
 			// Also add the new triangle to the output vector
 			output.push(make_pair(newTriangle, TrianglePtr(NULL)));
@@ -136,24 +132,16 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 		}
 
 		// Set pending neighbors for new triangles
-		int j = firstAdded;
-		if (!_triangulation[j]->setNeighbor(_triangulation[j + 1]))
-			cout << "ERROR: setting a neighbor no-neighbor\n";
-		if (!_triangulation[j]->setNeighbor(_triangulation[j + 2]))
-			cout << "ERROR: setting a neighbor no-neighbor\n";
-
-		if (!_triangulation[j + 1]->setNeighbor(_triangulation[j]))
-			cout << "ERROR: setting a neighbor no-neighbor\n";
-		if (!_triangulation[j + 1]->setNeighbor(_triangulation[j + 2]))
-			cout << "ERROR: setting a neighbor no-neighbor\n";
-
-		if (!_triangulation[j + 2]->setNeighbor(_triangulation[j]))
-			cout << "ERROR: setting a neighbor no-neighbor\n";
-		if (!_triangulation[j + 2]->setNeighbor(_triangulation[j + 1]))
-			cout << "ERROR: setting a neighbor no-neighbor\n";
+		for (int k = 0; k < 3; k++)
+		{
+			if (!addedTriangles[k]->setNeighbor(addedTriangles[(k+1)%3]))
+				cout << "ERROR: setting a neighbor no-neighbor\n";
+			if (!addedTriangles[k]->setNeighbor(addedTriangles[(k+2)%3]))
+				cout << "ERROR: setting a neighbor no-neighbor\n";
+		}
 
 		// Delete replaced triangle
-		_triangulation.erase(_triangulation.begin() + _containerTriangles.second[0]);
+		_triangulation.erase(_containerTriangles[0]);
 	}
 	else
 	{
@@ -166,10 +154,10 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 			cout << "** Collinear point!\n";
 
 		// First create the 4 new triangles
-		int firstAdded = _triangulation.size();
-		for (size_t i = 0; i < _containerTriangles.first.size(); i++)
+		vector <TrianglePtr> addedTriangles;
+		for (size_t i = 0; i < _containerTriangles.size(); i++)
 		{
-			TrianglePtr container = _containerTriangles.first[i];
+			TrianglePtr container = _containerTriangles[i];
 			vector<VertexPtr> vertices = container->getVertices();
 
 			if (Config::getDebugLevel() >= MEDIUM)
@@ -182,7 +170,10 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 				{
 					// Create new triangle and add it to the triangulation
 					TrianglePtr newTriangle(new Triangle(vertices[k], vertices[(k + 1) % 3], _vertex));
-					_triangulation.push_back(newTriangle);
+					_triangulation[newTriangle] = true;
+
+					// Save a reference for later
+					addedTriangles.push_back(newTriangle);
 
 					// Also add the new triangle to the output vector
 					output.push(make_pair(newTriangle, TrianglePtr(NULL)));
@@ -210,28 +201,27 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const pair<vector<Triangle
 		}
 
 		// Set pointers going to the neighbors and coming from them
-		for (size_t i = firstAdded; i < _triangulation.size(); i++)
-		{
-			for (size_t j = firstAdded; j < _triangulation.size(); j++)
+		for (int i = 0; i < 4; i++)
+				{
+			for (int j = 0; j < 4; j++)
 			{
 				if (i == j)
 					continue;
 
-				if (_triangulation[i]->setNeighbor(_triangulation[j]) && Config::getDebugLevel() >= MEDIUM)
-					cout << "Neighbor added to " << _triangulation[i]->getId() << " > " << _triangulation[j]->getId() << "\n";
+				if (addedTriangles[i]->setNeighbor(addedTriangles[j]) && Config::getDebugLevel() >= MEDIUM)
+					cout << "Neighbor added to " << addedTriangles[i]->getId() << " > " << addedTriangles[j]->getId() << "\n";
 			}
 		}
 
 		// Delete replaced triangles
-		_triangulation.erase(_triangulation.begin() + _containerTriangles.second[0]);
-		int offset = _containerTriangles.second[0] < _containerTriangles.second[1] ? 1 : 0;
-		_triangulation.erase(_triangulation.begin() + _containerTriangles.second[1] - offset);
+		_triangulation.erase(_containerTriangles[0]);
+		_triangulation.erase(_containerTriangles[1]);
 	}
 
 	return output;
 }
 
-void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const vector<TrianglePtr> &_triangulation)
+void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const map<TrianglePtr, bool> &_triangulation)
 {
 	static int legalizationCallCount = 0;
 
@@ -274,32 +264,24 @@ void legalizeTriangles(stack<pair<TrianglePtr, TrianglePtr>> &_triangles, const 
 	legalizationCallCount++;
 }
 
-void removeSuperTriangle(vector<TrianglePtr> &_triangulation, const TrianglePtr &_t0)
+void removeSuperTriangle(map<TrianglePtr, bool> &_triangulation, const TrianglePtr &_t0)
 {
-	// Vector to hold the indices of the triangles using a vertex of T0
-	map<size_t, bool> indices;
+	map<TrianglePtr, bool> eraseMap;
 
 	// Build a map with references to the triangles using each vertex
 	vector<VertexPtr> vertex = _t0->getVertices();
-	for (size_t i = 0; i < _triangulation.size(); i++)
+	for (pair<TrianglePtr, bool> pair : _triangulation)
 	{
 		for (int k = 0; k < 3; k++)
 		{
-			if (_triangulation[i]->isVertex(vertex[k]))
-				indices[i] = true;
+			if (pair.first->isVertex(vertex[k]))
+				eraseMap[pair.first] = true;
 		}
 	}
 
 	// Remove triangles
-	vector<TrianglePtr> cleanTriangulation;
-	cleanTriangulation.reserve(_triangulation.size());
-	for (size_t i = 0; i < _triangulation.size(); i++)
-	{
-		if (indices.find(i) == indices.end())
-			cleanTriangulation.push_back(_triangulation[i]);
-	}
-
-	_triangulation = cleanTriangulation;
+	for (pair<TrianglePtr, bool> pair : eraseMap)
+		_triangulation.erase(pair.first);
 }
 
 void preparePrinter(const TrianglePtr &_t0)
@@ -350,16 +332,14 @@ int main(int _nargs, char ** _vargs)
 	{
 		vertexList.reserve(stoi(_vargs[2]));
 		Helper::generateRandomSet(stoi(_vargs[2]), stoi(_vargs[3]), stoi(_vargs[4]), stoi(_vargs[5]), stoi(_vargs[6]), vertexList);
-
-		Helper::writePoints(vertexList, "./input/input7");
 	}
 	else
 		Helper::readInput(_vargs[1], vertexList);
 
 	// Initial triangle for triangulation
 	TrianglePtr t0 = Helper::calculateSurroundingTriangle(vertexList);
-	vector<TrianglePtr> triangulation = vector<TrianglePtr>();
-	triangulation.push_back(t0);
+	map<TrianglePtr, bool> triangulation = map<TrianglePtr, bool>();
+	triangulation[t0] = true;
 
 	// Prepare printer limits
 	preparePrinter(t0);
@@ -380,19 +360,15 @@ int main(int _nargs, char ** _vargs)
 		VertexPtr next = vertexList[i];
 		cout << "+++++ Adding vertex " << to_string(i) << ": " << *next << "\n";
 
-
-		se podría usar un mapa en vez de un vector para almacenar la triangulación y de esa forma las eliminaciones sería más simples
-		no se requeriría el índice y en consecuencia no se requeriría generar el mapa de índices en el jump and walk
-
 		// Get the triangles surrounding the current point
-		pair<vector<TrianglePtr>, vector<int>> containers;
+		vector <TrianglePtr> containers;
 		if (Config::getWalkingMethod() == JUMP_AND_WALK)
 			containers = jumpAndWalk(triangulation, next);
 		else
 			containers = getContainerTriangles(triangulation, next);
 
 		if (Config::getDebugLevel() >= MEDIUM)
-			Helper::printSelectedTriangles(triangulation, containers.first, next, "selectedTriangle" + to_string(i) + ".png");
+			Helper::printSelectedTriangles(triangulation, containers, next, "selectedTriangle" + to_string(i) + ".png");
 
 		// Add the new triangles according to the new vertex
 		stack<pair<TrianglePtr, TrianglePtr>> newTriangles = addNewTriangles(containers, triangulation, next);
@@ -402,10 +378,10 @@ int main(int _nargs, char ** _vargs)
 		if (Config::getDebugLevel() >= MEDIUM)
 			Helper::printNeighbors(triangulation, "triangulation" + to_string(i), ".png");
 
-		// Legalize the new added triangles
-		legalizeTriangles(newTriangles, triangulation);
-		if (Config::getDebugLevel() >= LOW)
-			Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
+		 // Legalize the new added triangles
+		 legalizeTriangles(newTriangles, triangulation);
+		 if (Config::getDebugLevel() >= LOW)
+			 Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
 	}
 	high_resolution_clock::time_point t2 = high_resolution_clock::now();
 

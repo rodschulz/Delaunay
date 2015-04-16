@@ -78,6 +78,17 @@ void Printer::printTriangulation(Mat &_image, const vector<TrianglePtr> &_triang
 	}
 }
 
+void Printer::printTriangulation(Mat &_image, const map<TrianglePtr, bool> &_triangulation)
+{
+	for (pair<TrianglePtr, bool> pair : _triangulation)
+	{
+		drawTriangle(_image, pair.first, BLUE);
+		vector<VertexPtr> vertices = pair.first->getVertices();
+		for (VertexPtr v : vertices)
+			drawPoint(_image, v);
+	}
+}
+
 void Printer::printSelectedTriangles(Mat &_image, const vector<TrianglePtr> &_selected)
 {
 	for (TrianglePtr t : _selected)

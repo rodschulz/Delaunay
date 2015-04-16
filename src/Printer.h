@@ -24,6 +24,7 @@ public:
 	static void printVertices(Mat &_image, const vector<VertexPtr> &_vertices);
 	// Prints the given triangles in the given image
 	static void printTriangulation(Mat &_image, const vector<TrianglePtr> &_triangulation);
+	static void printTriangulation(Mat &_image, const map<TrianglePtr, bool> &_triangulation);
 	// Prints the given triangles in the given image
 	static void printSelectedTriangles(Mat &_image, const vector<TrianglePtr> &_selected);
 	// Prints the neighbors relations of the given triangle

@@ -8,6 +8,7 @@
 #include "Triangle.h"
 #include <string>
 #include <vector>
+#include <map>
 #include <stdlib.h>
 
 using namespace std;
@@ -45,18 +46,22 @@ public:
 	 * Prints the given triangulation
 	 */
 	static void printTriangulation(const vector<TrianglePtr> &_triangulation, const string &_outputName);
+	static void printTriangulation(const map<TrianglePtr, bool> &_triangulation, const string &_outputName);
 	/**
 	 * Prints the triangulation along with the selected triangles
 	 */
 	static void printSelectedTriangles(const vector<TrianglePtr> &_triangulation, const vector<TrianglePtr> &_selected, const VertexPtr &_vertex, const string &_outputName);
+	static void printSelectedTriangles(const map<TrianglePtr, bool> &_triangulation, const vector<TrianglePtr> &_selected, const VertexPtr &_vertex, const string &_outputName);
 	/**
 	 * Prints triangulation and vertices
 	 */
 	static void printAll(const vector<TrianglePtr> &_triangulation, const vector<VertexPtr> &_vertices, const string &_outputName);
+	static void printAll(const map<TrianglePtr, bool> &_triangulation, const vector<VertexPtr> &_vertices, const string &_outputName);
 	/**
 	 * Prints a series of images displaying the neighbors associated to each triangle
 	 */
 	static void printNeighbors(const vector<TrianglePtr> &_triangulation, const string &_outputName, const string &_extension);
+	static void printNeighbors(const map<TrianglePtr, bool> &_triangulation, const string &_outputName, const string &_extension);
 	/**
 	 * Prints the given triangle along with given vector of vertices
 	 */

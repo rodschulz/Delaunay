@@ -13,6 +13,8 @@ Config::Config()
 {
 	randomize = false;
 	ids = true;
+	circles = false;
+	walkNumber = -1;
 	debugLevel = NONE;
 	walkingMethod = STANDARD;
 }
@@ -67,6 +69,10 @@ void Config::parse(const string _key, const string _value)
 		getInstance()->walkingMethod = _value.compare("jumpandwalk") == 0 ? JUMP_AND_WALK : STANDARD;
 	else if (_key.compare("showIds") == 0)
 		getInstance()->ids = _value.compare("true") == 0;
+	else if (_key.compare("drawCircles") == 0)
+		getInstance()->circles = _value.compare("true") == 0;
+	else if (_key.compare("drawWalk") == 0)
+		getInstance()->walkNumber = atoi(_value.c_str());
 }
 
 bool Config::randomizeInput()
@@ -79,7 +85,17 @@ bool Config::showIds()
 	return getInstance()->ids;
 }
 
+bool Config::drawCircles()
+{
+	return getInstance()->circles;
+}
+
 WalkingMethod Config::getWalkingMethod()
 {
 	return getInstance()->walkingMethod;
+}
+
+int Config::getWalkNumber()
+{
+	return getInstance()->walkNumber;
 }

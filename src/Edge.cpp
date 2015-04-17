@@ -32,3 +32,11 @@ std::ostream &operator<<(std::ostream &_stream, const Edge &_edge)
 	_stream << *_edge.vertex1 << " - " << *_edge.vertex2;
 	return _stream;
 }
+
+VertexPtr Edge::getVertex(const int _n) const
+{
+	if (_n == 0)
+		return vertex1;
+	else
+		return vertex2;
+}

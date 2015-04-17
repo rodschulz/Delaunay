@@ -54,6 +54,8 @@ public:
 	bool hasEdge(const Edge &_edge) const;
 	// Removes the given neighbor from the current triangle
 	void removeNeighbor(const TrianglePtr &_neighbor);
+	// Returns the circumcircle of the current triangle in the form ((Xc, Yc), radius)
+	pair<pair<double, double>, double> getCircumcircle();
 
 	// Returns the triangle's id
 	inline long getId() const

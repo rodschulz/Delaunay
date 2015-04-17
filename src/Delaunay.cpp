@@ -41,6 +41,9 @@ vector<TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, co
 {
 	vector<TrianglePtr> triangles = vector<TrianglePtr>();
 
+	bool storeWalk = Config::getWalkNumber() == (int) _triangulation.size();
+	vector<pair<TrianglePtr, Edge>> walk = vector<pair<TrianglePtr, Edge>>();
+
 	// Get the starting triangle randomly
 	int randomIndex = Helper::getRandomNumber(0, _triangulation.size() - 1);
 	map<TrianglePtr, bool>::const_iterator it = _triangulation.begin();
@@ -55,6 +58,8 @@ vector<TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, co
 		{
 			if (Helper::getOrientation(t->getVertex((index + k) % 3).get(), t->getVertex((index + k + 1) % 3).get(), _target.get()) < 0)
 			{
+				if (storeWalk)
+					walk.push_back(make_pair(t, t->getEdge((index + k) % 3)));
 				t = t->getNeighbor((index + k) % 3);
 				break;
 			}
@@ -74,6 +79,11 @@ vector<TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, co
 			triangles.push_back(n);
 			break;
 		}
+	}
+
+	if (storeWalk)
+	{
+		Helper::printWalk(walk, _triangulation, _target, "Walk_" + to_string(Config::getWalkNumber()) + ".png");
 	}
 
 	return triangles;
@@ -397,6 +407,10 @@ int main(int _nargs, char ** _vargs)
 	removeSuperTriangle(triangulation, t0);
 	// Print result
 	Helper::printAll(triangulation, vertexList, "final_triangulation.png");
+
+	// Print circumcircles
+	if (Config::drawCircles())
+		Helper::printCircumcircles(triangulation, vertexList, "circumcircles.png");
 
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 	cout << "Triangulation done in " << duration << "[us] using method " << Config::getWalkingMethod() << "\n";

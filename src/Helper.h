@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <math.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -67,6 +68,14 @@ public:
 	 */
 	static void printTriangle(const TrianglePtr &_triangle, const vector<VertexPtr> &_vertices, const string &_outputName);
 	/**
+	 * Prints the walk sequence
+	 */
+	static void printWalk(const vector<pair<TrianglePtr, Edge>> &_walk, const map<TrianglePtr, bool> &_triangulation, const VertexPtr &_destination, const string &_outputName);
+	/**
+	 * Prints all the triangles and their circumcircles
+	 */
+	static void printCircumcircles(const map<TrianglePtr, bool> &_triangulation, const vector<VertexPtr> &_vertices, const string &_outputName);
+	/**
 	 * Checks if the given string is a command or not
 	 */
 	static bool isCommand(const string &_str);
@@ -79,13 +88,23 @@ public:
 	 */
 	static int getRandomNumber(const int _min, const int _max);
 	/**
-	 * Calculates the euclidian distance a point and a vertex
+	 * Calculates the euclidean distance a point and a vertex
 	 */
 	static double distance(const pair<double, double> &_p, const VertexPtr &_v);
 	/**
 	 * Writes the given set of vertices to the given filename
 	 */
 	static void writePoints(const vector<VertexPtr> &_vertexList, const string &_filename);
+	/**
+	 * Calculates the euclidean distance between two given points
+	 */
+	static double distance(const double _x1, const double _y1, const double _x2, const double _y2)
+	{
+		double deltaX = _x2 - _x1;
+		double deltaY = _y2 - _y1;
+		return sqrt(deltaX * deltaX + deltaY * deltaY);
+	}
+
 private:
 	Helper();
 	Helper(const Helper &_other);

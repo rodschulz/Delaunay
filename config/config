@@ -2,3 +2,5 @@ debugLevel	none
 walkingMethod	jumpandwalk
 randomizeInput	false
 showIds		false
+drawCircles	true
+drawWalk	75

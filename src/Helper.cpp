@@ -3,7 +3,6 @@
  * 2015
  */
 #include "Helper.h"
-#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -217,6 +216,36 @@ void Helper::printTriangle(const TrianglePtr &_triangle, const vector<VertexPtr>
 	Printer::saveImage(_outputName, image);
 }
 
+void Helper::printWalk(const vector<pair<TrianglePtr, Edge>> &_walk, const map<TrianglePtr, bool> &_triangulation, const VertexPtr &_destination, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, _triangulation);
+	for (pair<TrianglePtr, Edge> pair : _walk)
+	{
+		Printer::drawEdge(image, pair.second, Scalar(0, 255, 255));
+		Printer::drawTriangle(image, pair.first, Scalar(0, 255, 0));
+	}
+	Printer::drawPoint(image, _destination, Scalar(0, 255, 255));
+
+	Printer::saveImage(_outputName, image);
+}
+
+void Helper::printCircumcircles(const map<TrianglePtr, bool> &_triangulation, const vector<VertexPtr> &_vertices, const string &_outputName)
+{
+	Mat image = Printer::generateBaseImage();
+
+	Printer::printTriangulation(image, _triangulation);
+	Printer::printVertices(image, _vertices);
+	for (pair<TrianglePtr, bool> p : _triangulation)
+	{
+		pair<pair<double, double>, double> circle = p.first->getCircumcircle();
+		Printer::drawCircle(image, circle.first.first, circle.first.second, circle.second, Scalar(0, 255, 255));
+	}
+
+	Printer::saveImage(_outputName, image);
+}
+
 bool Helper::isCommand(const string &_str)
 {
 	return _str.at(0) == '-';
@@ -272,4 +301,3 @@ void Helper::writePoints(const vector<VertexPtr> &_vertexList, const string &_fi
 
 	stream.close();
 }
-

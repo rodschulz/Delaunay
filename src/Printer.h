@@ -36,6 +36,15 @@ public:
 	// Calculates the conversion rate according to the given dimensions
 	void calculateConversionRate(const double _width, const double _height);
 
+	// Draws the given triangle in the given image
+	static void drawTriangle(Mat &_image, const TrianglePtr &_triangle, const Scalar &_color);
+	// Draws the given point in the given image
+	static void drawPoint(Mat &_image, const VertexPtr &_vertex, const Scalar &_color);
+	// Draws the given edge
+	static void drawEdge(Mat &_image, const Edge &_edge, const Scalar &_color);
+	// Draws the given circle
+	static void drawCircle(Mat &_image, const double _Xc, const double _Yc, const double _r, const Scalar &_color);
+
 private:
 	Printer();
 	~Printer();
@@ -49,8 +58,4 @@ private:
 	static Point convert(const double _x, const double _y);
 	// Converts a vertex from xy coordinates to pixels
 	static Point convert(const Vertex &_vertex);
-	// Draws the given triangle in the given image
-	static void drawTriangle(Mat &_image, const TrianglePtr &_triangle, const Scalar &_color);
-	// Draws the given point in the given image
-	static void drawPoint(Mat &_image, const VertexPtr &_vertex);
 };

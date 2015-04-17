@@ -37,8 +37,12 @@ public:
 	static bool randomizeInput();
 	// Boolean indicating if ids have to be drawn in images
 	static bool showIds();
+	// Boolean indicating if the circumcircles have to be drawn
+	static bool drawCircles();
 	// Returns the walking method to be used
 	static WalkingMethod getWalkingMethod();
+	// Returns the number of the walk to be drawn
+	static int getWalkNumber();
 
 private:
 	Config();
@@ -47,6 +51,8 @@ private:
 
 	bool randomize;
 	bool ids;
+	bool circles;
+	int walkNumber;
 	DebugLevel debugLevel;
 	WalkingMethod walkingMethod;
 };

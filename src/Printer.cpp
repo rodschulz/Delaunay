@@ -15,9 +15,9 @@
 static Scalar LIGHT_GRAY = Scalar(190, 190, 190);
 static Scalar BLACK = Scalar(0, 0, 0);
 static Scalar BLUE = Scalar(255, 0, 0);
-static Scalar GREEN = Scalar(0, 200, 0);
+static Scalar GREEN = Scalar(0, 255, 0);
 static Scalar RED = Scalar(0, 0, 255);
-static Scalar LIGHT_BLUE = Scalar(200, 200, 0);
+static Scalar LIGHT_BLUE = Scalar(0, 255, 255);
 
 Printer::Printer()
 {
@@ -57,16 +57,30 @@ void Printer::drawTriangle(Mat &_image, const TrianglePtr &_triangle, const Scal
 		putText(_image, to_string(_triangle->getId()), convert(center.first, center.second), CV_FONT_HERSHEY_SIMPLEX, 0.3, _color);
 }
 
-void Printer::drawPoint(Mat &_image, const VertexPtr &_vertex)
+void Printer::drawPoint(Mat &_image, const VertexPtr &_vertex, const Scalar &_color)
 {
 	Point p = convert(*_vertex);
-	circle(_image, p, 3, RED, -2);
+	circle(_image, p, 3, _color, -2);
+}
+
+void Printer::drawCircle(Mat &_image, const double _Xc, const double _Yc, const double _r, const Scalar &_color)
+{
+	Point p = convert(_Xc, _Yc);
+	int radius = getInstance()->toPixel(_r);
+	circle(_image, p, radius, _color);
+}
+
+void Printer::drawEdge(Mat &_image, const Edge &_edge, const Scalar &_color)
+{
+	Point p1 = convert(*_edge.getVertex(0));
+	Point p2 = convert(*_edge.getVertex(1));
+	line(_image, p1, p2, _color, 2);
 }
 
 void Printer::printVertices(Mat &_image, const vector<VertexPtr> &_vertices)
 {
 	for (VertexPtr v : _vertices)
-		drawPoint(_image, v);
+		drawPoint(_image, v, RED);
 }
 
 void Printer::printTriangulation(Mat &_image, const vector<TrianglePtr> &_triangulation)
@@ -76,7 +90,7 @@ void Printer::printTriangulation(Mat &_image, const vector<TrianglePtr> &_triang
 		drawTriangle(_image, t, BLUE);
 		vector<VertexPtr> vertices = t->getVertices();
 		for (VertexPtr v : vertices)
-			drawPoint(_image, v);
+			drawPoint(_image, v, RED);
 	}
 }
 
@@ -87,7 +101,7 @@ void Printer::printTriangulation(Mat &_image, const map<TrianglePtr, bool> &_tri
 		drawTriangle(_image, pair.first, BLUE);
 		vector<VertexPtr> vertices = pair.first->getVertices();
 		for (VertexPtr v : vertices)
-			drawPoint(_image, v);
+			drawPoint(_image, v, RED);
 	}
 }
 

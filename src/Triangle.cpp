@@ -4,6 +4,7 @@
  */
 
 #include <stdlib.h>
+#include <math.h>
 #include "Triangle.h"
 #include "Helper.h"
 #include "Config.h"
@@ -275,4 +276,80 @@ void Triangle::removeNeighbor(const TrianglePtr &_neighbor)
 			break;
 		}
 	}
+}
+
+pair<pair<double, double>, double> Triangle::getCircumcircle()
+{
+	pair<pair<double, double>, double> circle = make_pair(make_pair(0.0, 0.0), 0.0);
+
+	VertexPtr v1 = vertices[0];
+	VertexPtr v2 = vertices[1];
+	VertexPtr v3 = vertices[2];
+
+	double bx = v1->getX();
+	double by = v1->getY();
+	double cx = v2->getX();
+	double cy = v2->getY();
+	double dx = v3->getX();
+	double dy = v3->getY();
+	double temp = cx * cx + cy * cy;
+	double bc = (bx * bx + by * by - temp) / 2.0;
+	double cd = (temp - dx * dx - dy * dy) / 2.0;
+	double det = (bx - cx) * (cy - dy) - (cx - dx) * (by - cy);
+
+	if (fabs(det) < COMPARISON_EPSILON)
+	{
+		circle.first.first = 1.0;
+		circle.first.second = 1.0;
+		circle.second = 0.0;
+	}
+	else
+	{
+		det = 1 / det;
+
+		circle.first.first = (bc * (cy - dy) - cd * (by - cy)) * det;
+		circle.first.second = ((bx - cx) * cd - (cx - dx) * bc) * det;
+		cx = circle.first.first;
+		cy = circle.first.second;
+		circle.second = sqrt((cx - bx) * (cx - bx) + (cy - by) * (cy - by));
+	}
+
+//	double ax = v1->getX();
+//	double ay = v1->getY();
+//	double bx = v2->getX();
+//	double by = v2->getY();
+//	double cx = v3->getX();
+//	double cy = v3->getY();
+//
+//	// m1 - center of (a,b), the normal goes through it
+//	double f1 = (bx - ax) / (ay - by);
+//	double m1x = (ax + bx) / 2;
+//	double m1y = (ay + by) / 2;
+//	double g1 = m1y - f1 * m1x;
+//	double f2 = (cx - bx) / (by - cy);
+//	double m2x = (bx + cx) / 2;
+//	double m2y = (by + cy) / 2;
+//	double g2 = m2y - f2 * m2x;
+//
+//	// degenerated cases
+//	// - a, b have the same height -> slope of normal of |ab| = infinity
+//	if (ay == by)
+//	{
+//		circle.first.first = m1x;
+//		circle.first.second = f2 * m1x + g2;
+//	}
+//	else if (by == cy)
+//	{
+//		circle.first.first = m2x;
+//		circle.first.second = f1 * m2x + g1;
+//	}
+//	else
+//	{
+//		double x = (g2 - g1) / (f1 - f2);
+//		circle.first.first = x;
+//		circle.first.second = f1 * x + g1;
+//	}
+//	circle.second = Helper::distance(circle.first, v2);
+
+	return circle;
 }

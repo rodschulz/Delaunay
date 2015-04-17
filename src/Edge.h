@@ -19,6 +19,8 @@ public:
 	bool equals(const Edge &_other, const bool &_oriented = false) const;
 	// Checks if the given vertex is part of the current edge
 	bool contains(const VertexPtr &_vertex) const;
+	// Returns the asked vertex of the edge
+	VertexPtr getVertex(const int _n) const;
 
 private:
 	VertexPtr vertex1;

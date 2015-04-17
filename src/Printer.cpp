@@ -3,6 +3,7 @@
  * 2015
  */
 #include "Printer.h"
+#include "Config.h"
 
 #define OUTPUT_FOLDER		"./output/"
 #define WIDTH			1280
@@ -13,7 +14,7 @@
 // Color used to draw triangles
 static Scalar LIGHT_GRAY = Scalar(190, 190, 190);
 static Scalar BLACK = Scalar(0, 0, 0);
-static Scalar BLUE = Scalar(200, 0, 0);
+static Scalar BLUE = Scalar(255, 0, 0);
 static Scalar GREEN = Scalar(0, 200, 0);
 static Scalar RED = Scalar(0, 0, 255);
 static Scalar LIGHT_BLUE = Scalar(200, 200, 0);
@@ -52,13 +53,14 @@ void Printer::drawTriangle(Mat &_image, const TrianglePtr &_triangle, const Scal
 	line(_image, p3, p1, _color);
 
 	pair<double, double> center = _triangle->getCenter();
-	putText(_image, to_string(_triangle->getId()), convert(center.first, center.second), CV_FONT_HERSHEY_SIMPLEX, 0.3, _color);
+	if (Config::showIds())
+		putText(_image, to_string(_triangle->getId()), convert(center.first, center.second), CV_FONT_HERSHEY_SIMPLEX, 0.3, _color);
 }
 
 void Printer::drawPoint(Mat &_image, const VertexPtr &_vertex)
 {
 	Point p = convert(*_vertex);
-	circle(_image, p, 2, RED, -1);
+	circle(_image, p, 3, RED, -2);
 }
 
 void Printer::printVertices(Mat &_image, const vector<VertexPtr> &_vertices)
@@ -185,14 +187,32 @@ void Printer::calculateConversionRate(const double _width, const double _height)
 	double horizontalRate = WIDTH / _width;
 	double verticalRate = HEIGHT / _height;
 
-	step = 50;
-	if (horizontalRate < verticalRate)
+	conversionRate = horizontalRate < verticalRate ? horizontalRate : verticalRate;
+
+	double size = _width > _height ? _width : _height;
+	size /= 10;
+
+	double distance = numeric_limits<double>::max();
+	double last = step;
+	bool state = true;
+	while (true)
 	{
-		conversionRate = horizontalRate;
-	}
-	else
-	{
-		conversionRate = verticalRate;
+		double localDist = abs(step - size);
+		if (localDist >= distance)
+		{
+			step = last;
+			break;
+		}
+
+		distance = localDist;
+		last = step;
+
+		if (state)
+			step *= 2;
+		else
+			step *= 5;
+
+		state = !state;
 	}
 }
 

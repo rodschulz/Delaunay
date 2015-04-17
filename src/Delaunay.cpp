@@ -37,7 +37,7 @@ vector<TrianglePtr> getContainerTriangles(const map<TrianglePtr, bool> &_triangu
 	return triangles;
 }
 
-vector <TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, const VertexPtr &_target)
+vector<TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, const VertexPtr &_target)
 {
 	vector<TrianglePtr> triangles = vector<TrianglePtr>();
 
@@ -97,7 +97,7 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const vector<TrianglePtr> 
 			cout << "Container > " << *container << "\n";
 
 		// Add new triangles
-		vector <TrianglePtr> addedTriangles;
+		vector<TrianglePtr> addedTriangles;
 		for (int k = 0; k < 3; k++)
 		{
 			// Create new triangle and add it to the triangulation
@@ -134,9 +134,9 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const vector<TrianglePtr> 
 		// Set pending neighbors for new triangles
 		for (int k = 0; k < 3; k++)
 		{
-			if (!addedTriangles[k]->setNeighbor(addedTriangles[(k+1)%3]))
+			if (!addedTriangles[k]->setNeighbor(addedTriangles[(k + 1) % 3]))
 				cout << "ERROR: setting a neighbor no-neighbor\n";
-			if (!addedTriangles[k]->setNeighbor(addedTriangles[(k+2)%3]))
+			if (!addedTriangles[k]->setNeighbor(addedTriangles[(k + 2) % 3]))
 				cout << "ERROR: setting a neighbor no-neighbor\n";
 		}
 
@@ -154,7 +154,7 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const vector<TrianglePtr> 
 			cout << "** Collinear point!\n";
 
 		// First create the 4 new triangles
-		vector <TrianglePtr> addedTriangles;
+		vector<TrianglePtr> addedTriangles;
 		for (size_t i = 0; i < _containerTriangles.size(); i++)
 		{
 			TrianglePtr container = _containerTriangles[i];
@@ -202,7 +202,7 @@ stack<pair<TrianglePtr, TrianglePtr>> addNewTriangles(const vector<TrianglePtr> 
 
 		// Set pointers going to the neighbors and coming from them
 		for (int i = 0; i < 4; i++)
-				{
+		{
 			for (int j = 0; j < 4; j++)
 			{
 				if (i == j)
@@ -300,8 +300,8 @@ void preparePrinter(const TrianglePtr &_t0)
 		minY = minY > v->getY() ? v->getY() : minY;
 	}
 
-	double width = (abs(maxX) > abs(minX) ? abs(maxX) : abs(minX)) * 2.0;
-	double height = (abs(maxY) > abs(minY) ? abs(maxY) : abs(minY)) * 2.0;
+	double width = (abs(maxX) > abs(minX) ? abs(maxX) : abs(minX)) * 2.1;
+	double height = (abs(maxY) > abs(minY) ? abs(maxY) : abs(minY)) * 2.1;
 
 	Printer::getInstance()->calculateConversionRate(width, height);
 }
@@ -332,6 +332,12 @@ int main(int _nargs, char ** _vargs)
 	{
 		vertexList.reserve(stoi(_vargs[2]));
 		Helper::generateRandomSet(stoi(_vargs[2]), stoi(_vargs[3]), stoi(_vargs[4]), stoi(_vargs[5]), stoi(_vargs[6]), vertexList);
+
+		if (_nargs >= 9 && strcmp(_vargs[7], "-s") == 0)
+		{
+			cout << "Saving randomly generated input to " << _vargs[8] << "\n";
+			Helper::writePoints(vertexList, _vargs[8]);
+		}
 	}
 	else
 		Helper::readInput(_vargs[1], vertexList);
@@ -361,7 +367,7 @@ int main(int _nargs, char ** _vargs)
 		cout << "+++++ Adding vertex " << to_string(i) << ": " << *next << "\n";
 
 		// Get the triangles surrounding the current point
-		vector <TrianglePtr> containers;
+		vector<TrianglePtr> containers;
 		if (Config::getWalkingMethod() == JUMP_AND_WALK)
 			containers = jumpAndWalk(triangulation, next);
 		else
@@ -378,10 +384,10 @@ int main(int _nargs, char ** _vargs)
 		if (Config::getDebugLevel() >= MEDIUM)
 			Helper::printNeighbors(triangulation, "triangulation" + to_string(i), ".png");
 
-		 // Legalize the new added triangles
-		 legalizeTriangles(newTriangles, triangulation);
-		 if (Config::getDebugLevel() >= LOW)
-			 Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
+		// Legalize the new added triangles
+		legalizeTriangles(newTriangles, triangulation);
+		if (Config::getDebugLevel() >= LOW)
+			Helper::printTriangulation(triangulation, "legalizedPoint_" + to_string(i) + ".png");
 	}
 	high_resolution_clock::time_point t2 = high_resolution_clock::now();
 

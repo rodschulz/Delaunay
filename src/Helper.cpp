@@ -90,10 +90,11 @@ TrianglePtr Helper::calculateSurroundingTriangle(const vector<VertexPtr> &_verte
 	double width = maxX - minX;
 	double height = maxY - minY;
 
-	minX -= ceil(width / 4);
-	maxX += ceil(width / 4);
-	minY -= ceil(height / 4);
-	maxY += ceil(height / 4);
+	double divisor = 20;
+	minX -= ceil(width / divisor);
+	maxX += ceil(width / divisor);
+	minY -= ceil(height / divisor);
+	maxY += ceil(height / divisor);
 
 	// Update width and height with the new values of minimums and maximums
 	width = maxX - minX;

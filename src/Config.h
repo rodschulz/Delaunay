@@ -35,6 +35,8 @@ public:
 	static DebugLevel getDebugLevel();
 	// Returns a boolean value indicating if inputs has to be randomized
 	static bool randomizeInput();
+	// Boolean indicating if ids have to be drawn in images
+	static bool showIds();
 	// Returns the walking method to be used
 	static WalkingMethod getWalkingMethod();
 
@@ -44,6 +46,7 @@ private:
 	static void parse(const string _key, const string _value);
 
 	bool randomize;
+	bool ids;
 	DebugLevel debugLevel;
 	WalkingMethod walkingMethod;
 };

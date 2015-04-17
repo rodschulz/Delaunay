@@ -1,3 +1,4 @@
 debugLevel	none
 walkingMethod	jumpandwalk
 randomizeInput	false
+showIds		false

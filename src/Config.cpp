@@ -12,6 +12,7 @@
 Config::Config()
 {
 	randomize = false;
+	ids = true;
 	debugLevel = NONE;
 	walkingMethod = STANDARD;
 }
@@ -64,11 +65,18 @@ void Config::parse(const string _key, const string _value)
 		getInstance()->randomize = _value.compare("true") == 0;
 	else if (_key.compare("walkingMethod") == 0)
 		getInstance()->walkingMethod = _value.compare("jumpandwalk") == 0 ? JUMP_AND_WALK : STANDARD;
+	else if (_key.compare("showIds") == 0)
+		getInstance()->ids = _value.compare("true") == 0;
 }
 
 bool Config::randomizeInput()
 {
 	return getInstance()->randomize;
+}
+
+bool Config::showIds()
+{
+	return getInstance()->ids;
 }
 
 WalkingMethod Config::getWalkingMethod()

@@ -40,8 +40,6 @@ vector<TrianglePtr> getContainerTriangles(const map<TrianglePtr, bool> &_triangu
 vector<TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, const VertexPtr &_target)
 {
 	vector<TrianglePtr> triangles = vector<TrianglePtr>();
-
-	bool storeWalk = Config::getWalkNumber() == (int) _triangulation.size();
 	vector<pair<TrianglePtr, Edge>> walk = vector<pair<TrianglePtr, Edge>>();
 
 	// Get the starting triangle randomly
@@ -58,8 +56,7 @@ vector<TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, co
 		{
 			if (Helper::getOrientation(t->getVertex((index + k) % 3).get(), t->getVertex((index + k + 1) % 3).get(), _target.get()) < 0)
 			{
-				if (storeWalk)
-					walk.push_back(make_pair(t, t->getEdge((index + k) % 3)));
+				walk.push_back(make_pair(t, t->getEdge((index + k) % 3)));
 				t = t->getNeighbor((index + k) % 3);
 				break;
 			}
@@ -81,10 +78,8 @@ vector<TrianglePtr> jumpAndWalk(const map<TrianglePtr, bool> &_triangulation, co
 		}
 	}
 
-	if (storeWalk)
-	{
-		Helper::printWalk(walk, _triangulation, _target, "Walk_" + to_string(Config::getWalkNumber()) + ".png");
-	}
+	if ((int) walk.size() >= Config::getWalkNumber())
+		Helper::printWalk(walk, _triangulation, _target, "Walk_" + to_string(_triangulation.size()) + ".png");
 
 	return triangles;
 }
